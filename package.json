@@ -26,5 +26,11 @@
   "bugs": {
     "url": "https://github.com/N0bl3/leagueofmasteries/issues"
   },
-  "homepage": "https://github.com/N0bl3/leagueofmasteries#readme"
+  "homepage": "https://github.com/N0bl3/leagueofmasteries#readme",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "cfenv": "^1.0.3",
+    "express": "^4.13.4",
+    "request": "^2.72.0"
+  }
 }
