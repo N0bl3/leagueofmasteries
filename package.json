@@ -1,0 +1,30 @@
+{
+  "name": "leagueofmasteries",
+  "version": "1.0.0",
+  "description": "Visualize mastery-related data to win more games!",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/N0bl3/leagueofmasteries.git"
+  },
+  "keywords": [
+    "league",
+    "legends",
+    "mastery",
+    "tree",
+    "data",
+    "visualize",
+    "game",
+    "win"
+  ],
+  "author": "Alexandre Noble",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/N0bl3/leagueofmasteries/issues"
+  },
+  "homepage": "https://github.com/N0bl3/leagueofmasteries#readme"
+}
