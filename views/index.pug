@@ -6,6 +6,23 @@ html
 
   body
     p Welcome to this (yes!!) awesome app!
-    form(action="/euw/")
-      input(type="text" placeholder="Search a summoner by name...")
-      input(type="submit")
+    form#summ-by-name
+      label(for="summ-name")
+        input(type="text" name="summ-name" placeholder="Search a summoner by name...")
+      label(for="platform-id")
+        select(name="platform-id")
+          option(value="euw") EUW
+          option(value="br") BR
+          option(value="eune") EUNE
+          option(value="na") NA
+          option(value="jp") JP
+          option(value="kr") KR
+          option(value="lan") LAN
+          option(value="las") LAS
+          option(value="oce") OCE
+          option(value="ru") RU
+          option(value="tr") TR
+      input(type="submit" value="OK?")
+    script(type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
+    script(type="text/javascript" src="index.js")
+      
