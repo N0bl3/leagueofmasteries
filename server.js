@@ -19,6 +19,8 @@ try {
     console.error(e.name + ":" + e.message);
 }
 
+app.engine('pug', require('pug').__express);
+
 app.use(express.static(__dirname + '/views'));
 
 app.use(bodyParser.json());
@@ -28,7 +30,9 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get("/", function (req, res) {
-    res.end("index.html");
+    res.render('index', function (err, html) {
+        res.send(html);
+    });
 });
 //Get summoner info from his name and location
 app.get("/:region/:summonerName", function (req, res) {
