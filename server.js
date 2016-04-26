@@ -7,21 +7,12 @@ var pug = require('pug');
 var app = express();
 
 var appEnv = cfenv.getAppEnv();
-var api = "api_key=" + appEnv.app.RIOT_API;
 
-var riotURL;
-try {
-    if (api) {
-        riotURL = "https://euw.api.pvp.net/api/lol";
-    } else {
-        throw new Error("no API key");
-    }
-} catch (e) {
-    console.error(e.name + ":" + e.message);
-}
+var api = "api_key=" + process.env.RIOT_API;
 
 app.engine('pug', pug.renderFile);
 app.set('views', __dirname + '/views');
+app.use(express.static('public'));
 
 app.use(bodyParser.json());
 
@@ -39,10 +30,12 @@ app.get("/", function (req, res) {
     });
 });
 //Get summoner info from his name and location
-app.get("/:region/:summonerName", function (req, res) {
+app.get("/:platformId/:summonerName", function (req, res) {
+	if (/br|eune|euw|kr|lan|las|oce|ru|tr|na|jp|/.test(req.params.platformId) && /^[a-zA-Z0-9]+$/.test(summonerName)){
+	console.log(req.params);
     var sName = req.params.summonerName;
     request({
-        url: riotURL + "/" + req.params.region + "/v1.4/summoner/by-name/" + sName + "?" + api,
+        url: "https://euw.api.pvp.net/api/lol/" + req.params.platformId + "/v1.4/summoner/by-name/" + sName + "?" + api,
         method: "GET",
         json: true
     }, function (error, response, body) {
@@ -50,29 +43,18 @@ app.get("/:region/:summonerName", function (req, res) {
             body = JSON.stringify(body[sName]);
             res.end(body);
         } else {
-            console.error("Error at endpoint : /:region/:summonerName\nStatus Code : " + response.statusCode);
+            console.error("Error at endpoint : /:platformId/:summonerName\nStatus Code : " + response.statusCode);
         }
     });
+    } else {
+    	res.sendStatus(400).end();
+    }
 });
-//Get mastery book for a summoner
-app.get("/:region/:summId/masteries", function (req, res) {
-    request({
-        url: riotURL + "/" + req.params.region + "/v1.4/summoner/" + req.params.summId + "/masteries?" + api,
-        method: "GET",
-        json: true
-    }, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            body = JSON.stringify(body[req.params.summId]);
-            res.end(body);
-        } else {
-            console.error("Error! " + JSON.stringify(body));
-        }
-    });
-});
+
 //Get a champion mastery by player id and champion id. Response code 204 means there were no masteries found for given player id or player id and champion id combination. (RPC)
 app.get("/:platformId/:playerId/:championId", function (req, res) {
     request({
-        url: riotURL + "/championmastery/location/" + req.params.platformId + "/player/" + req.params.playerId + "/champion/" + req.params.championId + "?" + api,
+        url: "https://euw.api.pvp.net/api/lol/championmastery/location/" + req.params.platformId + "/player/" + req.params.playerId + "/champion/" + req.params.championId + "?" + api,
         method: "GET",
         json: true
     }, function (error, response, body) {
@@ -87,7 +69,7 @@ app.get("/:platformId/:playerId/:championId", function (req, res) {
 //Get all champion mastery entries sorted by number of champion points descending (RPC)
 app.get("/:platformId/:playerId/champions", function (req, res) {
     request({
-        url: riotURL + "/championmastery/location/" + req.params.platformId + "/player/" + req.params.playerId + "/champions" + "?" + api,
+        url: "https://euw.api.pvp.net/api/lol/championmastery/location/" + req.params.platformId + "/player/" + req.params.playerId + "/champions" + "?" + api,
         method: "GET",
         json: true
     }, function (error, response, body) {
@@ -117,7 +99,7 @@ app.get("/:platformId/:playerId", function (req, res) {
 //Get specified number of top champion mastery entries sorted by number of champion points descending (RPC)
 app.get("/:platformId/:playerId/top", function (req, res) {
     request({
-        url: riotURL + "/championmastery/location/" + req.paramsplatformId + "/player/" + req.paramsplayerId + "/topchampions" + "?" + api,
+        url: "https://euw.api.pvp.net/api/lol/championmastery/location/" + req.paramsplatformId + "/player/" + req.paramsplayerId + "/topchampions" + "?" + api,
         method: "GET",
         json: true
     }, function (error, response, body) {
