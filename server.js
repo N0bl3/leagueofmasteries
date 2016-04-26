@@ -3,6 +3,7 @@ var request = require('request');
 var express = require('express');
 var cfenv = require('cfenv');
 var bodyParser = require('body-parser');
+var pug = require('pug');
 var app = express();
 
 var appEnv = cfenv.getAppEnv();
@@ -11,7 +12,7 @@ var api = "api_key=" + appEnv.app.RIOT_API;
 var riotURL;
 try {
     if (api) {
-        var riotURL = "https://euw.api.pvp.net/api/lol";
+        riotURL = "https://euw.api.pvp.net/api/lol";
     } else {
         throw new Error("no API key");
     }
@@ -19,9 +20,8 @@ try {
     console.error(e.name + ":" + e.message);
 }
 
-app.engine('pug', require('pug').__express);
-
-app.use(express.static(__dirname + '/views'));
+app.engine('pug', pug.renderFile);
+app.set('views', __dirname + '/views');
 
 app.use(bodyParser.json());
 
@@ -30,8 +30,12 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get("/", function (req, res) {
-    res.render('index', function (err, html) {
-        res.send(html);
+    res.render('index.pug', function (err, html) {
+    	if(!err){
+        	res.send(html);
+        } else {
+        	console.error(err);
+        }
     });
 });
 //Get summoner info from his name and location
