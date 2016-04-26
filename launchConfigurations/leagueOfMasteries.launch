@@ -1,0 +1,18 @@
+{
+  "ServiceId": "com.ibm.cloudoe.orion.client.deploy",
+  "Params": {
+    "Target": {
+      "Url": "https://api.eu-gb.bluemix.net",
+      "Org": "Beezzii",
+      "Space": "Beezzii"
+    },
+    "Name": "leagueOfMasteries",
+    "Instrumentation": {
+      "host": "leagueofmasteries",
+      "domain": "eu-gb.mybluemix.net",
+      "memory": "256M"
+    }
+  },
+  "Path": "manifest.yml",
+  "Type": "Cloud Foundry"
+}
