@@ -44,6 +44,20 @@ app.get("/:region/:summonerName", function (req, res) {
         }
     });
 });
+app.get("/:region/:summId/masteries", function (req, res) {
+    request({
+        url: riotURL + "/" + req.params.region + "/v1.4/summoner/" + req.params.summId + "/masteries?" + api,
+        method: "GET",
+        json: true
+    }, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            body = JSON.stringify(body[req.params.summId]);
+            res.end(body);
+        } else {
+            console.error("Error! " + JSON.stringify(body));
+        }
+    });
+});
 // Runs the server
 app.listen(appEnv.port, function () {
 
