@@ -13,13 +13,10 @@ try {
     if (api) {
         var riotURL = "https://euw.api.pvp.net/api/lol";
     } else {
-        throw {
-            message: "no API key"
-        };
-
+        throw new Error("no API key");
     }
 } catch (e) {
-    console.error(e.message);
+    console.error(e.name + ":" + e.message);
 }
 
 app.use(express.static(__dirname + '/public'));
