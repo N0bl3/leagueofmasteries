@@ -19,13 +19,16 @@ try {
     console.error(e.name + ":" + e.message);
 }
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/views'));
 
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.get("/", function (req, res) {
+    res.end("index.html");
+});
 app.get("/:region/:summonerName", function (req, res) {
     var sName = req.params.summonerName;
     request({
