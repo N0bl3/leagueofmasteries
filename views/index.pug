@@ -26,8 +26,14 @@ html
     p#response-zone
     p Total score : 
       span#player-score 0
-    button#progression-button(type="button") Progression
+    button#progression-button(type="button" disabled) Progression
     button#leaderboards-button(type="button" disabled) Leaderboards
+    button#get-top-ten(type="button" disabled) Get Top Ten Champions
+    form#by-champion
+      select(name="champion")
+        each champion in champions
+          option(value=champion.key)= champion.name
+    p#top-zone
     p#progression-zone
     script(type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.3.11/parsley.min.js")

@@ -19,6 +19,8 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+var champions;
+
 function regionToPlatformId(region){
 	switch (region){
 		case "eune":
@@ -46,14 +48,37 @@ function regionToPlatformId(region){
 	}
 }
 
+function champIdToChampObject(champId){
+		champions.forEach(function(champion){
+			if (champId == champion.id) {
+				return champion;
+			}
+		});
+		return false;
+}
+
+//Get champions list
+request({
+		url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?" + api,
+		method: "GET",
+		json: true
+}, function(error, response, body){
+		if (!error && response.statusCode == 200){
+			champions = body.data;
+		} else {
+			console.error("Error retrieving champions\nStatus Code : " + response.statusCode);
+		}
+});
+
 app.get("/", function (req, res) {
-    res.render('index.pug', function (err, html) {
-    	if(!err){
-        	res.send(html);
-        } else {
-        	console.error(err);
-        }
-    });
+		res.render('index.pug', {champions: champions}, function (err, html) {
+    		if(!err){
+        		res.send(html);
+        	} else {
+        		console.error(err);
+        		res.end("Error while starting app!");
+        	}
+    	});
 });
 
 //Get summoner info from his name and location
@@ -68,8 +93,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
         json: true
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.stringify(body[summonerName]);
-            res.end(body);
+            res.send(body[summonerName]);
         } else {
             console.error("Error at endpoint : /:region/:summonerName\nStatus Code : " + response.statusCode);
         }
@@ -92,10 +116,9 @@ app.get("/:region/pid/:playerId/champid/:championId", function (req, res) {
         json: true
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.stringify(body);
-            res.end(body);
+            res.send(body);
         } else if(!error && response.statusCode == 204) {
-        	res.sendStatus(204).end();
+        	res.status(204).end();
         } else {
             console.error("Error at endpoint : /:platformId/pid/:playerId/:championId\nStatus Code : " + response.statusCode);
         }
@@ -114,8 +137,7 @@ app.get("/:region/pid/:playerId/champions", function (req, res) {
         json: true
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.stringify(body);
-            res.end(body);
+            res.send(body);
         } else {
             console.error("Error at endpoint : /:platformId/pid/:playerId/champions\nStatus Code : " + response.statusCode);
         }
@@ -126,37 +148,39 @@ app.get("/:region/pid/:playerId/champions", function (req, res) {
 app.get("/:region/pid/:playerId", function (req, res) {
 	console.log(req.params);
 	var region = req.params.region;
-	var platformId = regionToPlatformId(req.params.region);
+	var platformId = regionToPlatformId(region);
 	var playerId = req.params.playerId;
 	console.log(region, platformId, playerId);
     request({
         url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/score" + "?" + api,
-        method: "GET",
-        json: true
+        method: "GET"
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.stringify(body);
-            res.end(body);
+            res.send(body);
+        } else if (!error) {
+        	res.status(response.statusCode).end();
         } else {
-            console.error("Error at endpoint : /:platformId/pid/:playerId\nStatus Code : " + response.statusCode+ " " + body);
+            console.error("Error at endpoint : /:platformId/pid/:playerId\nStatus Code : " + response.statusCode + " " + body);
         }
     });
 });
 
 //Get specified number of top champion mastery entries sorted by number of champion points descending (RPC)
 app.get("/:region/pid/:playerId/top", function (req, res) {
+	if (req.query.n){
+		req.query.n = 3;
+	}
 	console.log(req.params);
 	var region = req.params.region;
 	var platformId = regionToPlatformId(req.params.region);
 	var playerId = req.params.playerId;
     request({
-        url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/topchampions" + "?" + api,
+        url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/topchampions" + "?count=" + req.query.n + "&" + api,
         method: "GET",
         json: true
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.stringify(body);
-            res.end(body);
+            res.send(body);
         } else {
             console.error("Error at endpoint : /:platformId/pid/:playerId/top\nStatus Code : " + response.statusCode);
         }

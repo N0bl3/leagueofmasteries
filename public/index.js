@@ -10,38 +10,50 @@ $(document).ready(function(){
 
    playerName = submission[0].value;
    region = submission[1].value;
-   $.get(window.location.href + region + "/sname/" + playerName)
-   .done(function(data){
-   	console.log(data);
-   	$("#response-zone").text(data);
-   	data = JSON.parse(data);
-   	playerId = data.id;
+   $.getJSON(window.location.href + region + "/sname/" + playerName)
+   .done(function(json){
+   	$("#response-zone").text(JSON.stringify(json));
+   	playerId = json.id;
    })
    .then(function(){
-   	$.get(window.location.href + region + "/pid/" + playerId)
-   	.done(function(data){
-   		playerScore = data;
+   	$.getJSON(window.location.href + region + "/pid/" + playerId)
+   	.done(function(score){
+   		playerScore = score;
    	})
    	.then(function(){
    		$("#player-score").text(playerScore);
    	});
+   	$("button").removeAttr("disabled");
    });
 
   });
   
   $("button#leaderboards-button").click(function(){
-  	$.get("")
+  	$.getJSON("")
   	.done(function(data){
   		
   	});
   });
   
   $("button#progression-button").click(function(){
-  	console.log(region, playerId);
-  	$.get(window.location.href + region + "/pid/" + playerId + "/champions")
-  	.done(function(data){
-   	console.log(data);
-   	$("#progression-zone").text(data);
+  	$.getJSON(window.location.href + region + "/pid/" + playerId + "/champions")
+  	.done(function(arr){
+  	var text = "";
+   	arr.forEach(function(champion){
+   		text += text ? "<br>ID : " + champion.championId + " Grade : " + (champion.highestGrade||"None") : "ID : " + champion.championId + " Grade : " + (champion.highestGrade||"None");
+   	});
+   	$("#progression-zone").append(text);
+  	});
+  });
+  
+  $("button#get-top-ten").click(function(){
+  	$.getJSON(window.location.href + region + "/pid/" + playerId + "/top" + "?n=10")
+  	.done(function(arr){
+  		var text = "";
+		arr.forEach(function(champion){
+			text += text ? "<br>ID : " + champion.championId + " Grade : " + (champion.highestGrade||"None") : "ID : " + champion.championId + " Grade : " + (champion.highestGrade||"None");
+		});
+  		$("#top-zone").append(text);
   	});
   });
 });
