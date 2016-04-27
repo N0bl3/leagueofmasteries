@@ -9,8 +9,8 @@ html
     form#summ-by-name
       label(for="summ-name")
         input(type="text" name="summ-name" placeholder="Search a summoner by name...")
-      label(for="platform-id")
-        select(name="platform-id")
+      label(for="region")
+        select(name="region")
           option(value="euw") EUW
           option(value="br") BR
           option(value="eune") EUNE
@@ -23,6 +23,13 @@ html
           option(value="ru") RU
           option(value="tr") TR
       input(type="submit" value="OK?")
+    p#response-zone
+    p Total score : 
+      span#player-score 0
+    button#progression-button(type="button") Progression
+    button#leaderboards-button(type="button" disabled) Leaderboards
+    p#progression-zone
     script(type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.3.11/parsley.min.js")
     script(type="text/javascript" src="index.js")
       
