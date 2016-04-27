@@ -7,7 +7,7 @@ $(document).ready(function(){
    var platformId = submission[1].value;
 
 //   console.log(platformId + " " + summonerName);
-   window.location.href = window.location.href + platformId + "/" + summonerName;
+   window.location.href = window.location.href + platformId + "/sname/" + summonerName;
 
   });
 });
