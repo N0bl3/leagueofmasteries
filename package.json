@@ -32,7 +32,8 @@
     "cfenv": "^1.0.3",
     "express": "^4.13.4",
     "request": "^2.72.0",
-    "pug": "^2.0.0-alpha6"
+    "pug": "^2.0.0-alpha6",
+    "redis": "2.6.0-1"
   },
   "devDependencies": {
     "chai": "*",
