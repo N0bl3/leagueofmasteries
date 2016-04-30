@@ -4,6 +4,7 @@ var express = require('express');
 var cfenv = require('cfenv');
 var bodyParser = require('body-parser');
 var pug = require('pug');
+var redis= require('redis');
 var app = express();
 
 var appEnv = cfenv.getAppEnv();
@@ -131,24 +132,25 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 });
 
 //Get a champion mastery by player id and champion id. Response code 204 means there were no masteries found for given player id or player id and champion id combination. (RPC)
-app.get("/:region/pid/:playerId/champid/:championId", function (req, res) {
+app.get("/:region/pid/:playerId/cid/:championId", function(req, res){
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId) && !isNaN(req.params.championId)) {
 		var region = req.params.region;
-		var platformId = regionToPlatformId(req.params.region);
+		var platformId = regionToPlatformId(region);
 		var playerId = req.params.playerId;
 		var championId = req.params.championId;
 		request({
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/champion/" + championId + "?" + api,
 			method: "GET",
 			json: true
-		}, function (error, response, body) {
+		}, function (error, response, body){
 			if (!error && response.statusCode == 200) {
+				body.championName = champIdToChampObject(body.championId).name;
 				res.send(body);
 			} else if (!error && response.statusCode == 204) {
-				res.status(204).end();
+				res.status(204).end(response.statusCode + " : No masteries found for given player id or player id and champion id combination");
 			} else {
-				console.error("Error at endpoint : /:platformId/pid/:playerId/:championId\nStatus Code : " + response.statusCode);
+				console.error("Error at endpoint : /:region/pid/:playerId/cid/:championId\nStatus Code : " + response.statusCode);
 				res.sendStatus(response.statusCode);
 			}
 		});
@@ -243,7 +245,7 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
 		var region = req.params.region;
-		var platformId = regionToPlatformId(req.params.region);
+		var platformId = regionToPlatformId(region);
 		var playerId = req.params.playerId;
 		request({
 			url: "https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api,

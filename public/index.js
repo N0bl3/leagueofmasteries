@@ -4,7 +4,9 @@ $(document).ready(function () {
         playerName = options.playerName || "",
         region = options.region || "",
         playerScore;
-
+        
+    $("#response-zone").append("<h3>ID: " + playerId + " - " + playerName + "</h3>");
+    
     $("form#summ-by-name").submit(function (event) {
         event.preventDefault();
         var submission = $(this).serializeArray();
@@ -14,8 +16,6 @@ $(document).ready(function () {
             .done(function (json) {
                 playerId = json.id;
                 $("#response-zone").text("");
-                $("#top-zone").text("");
-                $("#progression-zone").text("");
                 $("#response-zone").append("<p><img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/profileicon/" + json.profileIconId + ".png'></p><h3>ID: " + playerId + " - " + playerName + "</h3><h4>Level: " + json.summonerLevel + "</h4>");
             })
             .then(function () {
@@ -66,10 +66,9 @@ $(document).ready(function () {
         event.preventDefault();
         $.getJSON(window.location.href + region + "/pid/" + playerId + "/champions")
             .done(function (arr) {
-                $("#top-zone").text("");
-                $("#progression-zone").text("");
+                $("#response-zone").text("");
                 arr.forEach(function (champion) {
-                    $("#progression-zone").append("<div class='col-xs-3'><p>" +
+                    $("#response-zone").append("<div class='col-xs-3'><p>" +
                         "<img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
                         champion.name +
                         "</span><br>Grade:Level<br><span id='champion-grade'>" +
@@ -83,10 +82,9 @@ $(document).ready(function () {
         event.preventDefault();
         $.getJSON(window.location.href + region + "/pid/" + playerId + "/top?count=12")
             .done(function (arr) {
-                $("#progression-zone").text("");
-                $("#top-zone").text("");
+                $("#response-zone").text("");
                 arr.forEach(function (champion) {
-                    $("#top-zone").append("<div class='col-xs-3'><p>" +
+                    $("#response-zone").append("<div class='col-xs-3'><p>" +
                         "<img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + champion.name + "' class='top-img'><br><span id='champion-name'>" +
                         champion.name +
                         "</span><br>Grade:<br><span id='champion-grade'>" +
@@ -99,7 +97,30 @@ $(document).ready(function () {
     $("form#by-champion").submit(function(event){
 		event.preventDefault();
 		var submission = $(this).serializeArray();
+		var championId = submission[0].value;
 		$.getJSON(window.location.href + region + "/pid/" + playerId + "/cid/" + championId)
-		.done(function(data){});
+		.done(function(data, textStatus, jqXHR){
+			$("#response-zone").text("");
+			if (jqXHR.status == 200){
+				console.log(data);
+				var championName = data.championName,
+				championLevel = data.championLevel,
+				championPoints = data.championPoints,
+				highestGrade = data.highestGrade,
+				lastPlayTime = data.lastPlayTime;
+				$("#response-zone").text(championName + " " + championLevel + " " + championPoints + " " + highestGrade + " " + lastPlayTime);
+				
+				$("form#compare-champ-with-friend").submit(function(event){
+					event.preventDefault();
+					var submission = $(this).serializeArray();
+					var friendName = submission[0].value;
+					var friendRegion = submission[1].value;
+					$.getJSON(window.location.href + friendRegion + "/sname/" + friendName);
+				});
+			} else if (jqXHR.status == 204) {
+				console.error(jqXHR.status, textStatus);
+				$("#response-zone").text(jqXHR.status + " " + textStatus);
+			}
+		});
     });
 });
