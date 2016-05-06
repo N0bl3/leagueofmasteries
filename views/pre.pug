@@ -31,22 +31,25 @@ html.no-js(lang='en')
       script(src='https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js')
     div.container-fluid
       div.row.text-center
-        form#summ-by-name.navbar-form.navbar-left(role="search")
-          div.form-group
-            input.form-control(type="text" name="summ-name" placeholder="Search for a summoner")
-            select(name="region")
-              option(value="euw") EUW
-              option(value="br") BR
-              option(value="eune") EUNE
-              option(value="na") NA
-              option(value="jp") JP
-              option(value="kr") KR
-              option(value="lan") LAN
-              option(value="las") LAS
-              option(value="oce") OCE
-              option(value="ru") RU
-              option(value="tr") TR
-            button.btn.btn-default(type="submit") Search
+        h1 League Of Masteries
+      div.row.text-center
+        div.col-xs-2.col-xs-offset-5
+          form#summ-by-name(role="search")
+            div.form-group
+              input.form-control(type="text" name="summ-name" placeholder="Search for a summoner")
+              select(name="region")
+                option(value="euw") EUW
+                option(value="br") BR
+                option(value="eune") EUNE
+                option(value="na") NA
+                option(value="jp") JP
+                option(value="kr") KR
+                option(value="lan") LAN
+                option(value="las") LAS
+                option(value="oce") OCE
+                option(value="ru") RU
+                option(value="tr") TR
+              button.btn.btn-default(type="submit") Search
     script(type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
     script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous")
     script(type="text/javascript" src="pre.js")
