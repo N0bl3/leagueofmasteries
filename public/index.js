@@ -1,12 +1,14 @@
 /*jshint browser:true, jquery:true*/
+
+//si il y a un # dans l'url on ne peut pas rechercher un nouveau joueur
 $(document).ready(function () {
     var playerId = options.playerId || "",
         playerName = options.playerName || "",
         region = options.region || "",
         playerScore;
-        
+
     $("#response-zone").append("<h3>ID: " + playerId + " - " + playerName + "</h3>");
-    
+
     $("form#summ-by-name").submit(function (event) {
         event.preventDefault();
         var submission = $(this).serializeArray();
@@ -93,34 +95,49 @@ $(document).ready(function () {
                 });
             });
     });
-    
-    $("form#by-champion").submit(function(event){
-		event.preventDefault();
-		var submission = $(this).serializeArray();
-		var championId = submission[0].value;
-		$.getJSON(window.location.href + region + "/pid/" + playerId + "/cid/" + championId)
-		.done(function(data, textStatus, jqXHR){
-			$("#response-zone").text("");
-			if (jqXHR.status == 200){
-				console.log(data);
-				var championName = data.championName,
-				championLevel = data.championLevel,
-				championPoints = data.championPoints,
-				highestGrade = data.highestGrade,
-				lastPlayTime = data.lastPlayTime;
-				$("#response-zone").text(championName + " " + championLevel + " " + championPoints + " " + highestGrade + " " + lastPlayTime);
-				
-				$("form#compare-champ-with-friend").submit(function(event){
-					event.preventDefault();
-					var submission = $(this).serializeArray();
-					var friendName = submission[0].value;
-					var friendRegion = submission[1].value;
-					$.getJSON(window.location.href + friendRegion + "/sname/" + friendName);
-				});
-			} else if (jqXHR.status == 204) {
-				console.error(jqXHR.status, textStatus);
-				$("#response-zone").text(jqXHR.status + " " + textStatus);
-			}
-		});
+
+    $("form#by-champion").submit(function (event) {
+        event.preventDefault();
+        var submission = $(this).serializeArray();
+        var championId = submission[0].value;
+        var championName = "",
+            championLevel = "",
+            championPoints = "",
+            highestGrade = "",
+            lastPlayTime = "";
+        $.getJSON(window.location.href + region + "/pid/" + playerId + "/cid/" + championId)
+            .done(function (data, textStatus, jqXHR) {
+                $("#response-zone").text("");
+                if (jqXHR.status == 200) {
+                    console.log(data);
+                    championName = data.championName;
+                    championLevel = data.championLevel;
+                    championPoints = data.championPoints;
+                    highestGrade = data.highestGrade;
+                    lastPlayTime = data.lastPlayTime;
+                    //				not dev
+                    $("form#compare-champ-with-friend").submit(function (event) {
+                        event.preventDefault();
+                        var submission = $(this).serializeArray();
+                        var friendName = submission[0].value;
+                        var friendRegion = submission[1].value;
+                        $.getJSON(window.location.href + friendRegion + "/sname/" + friendName);
+                    });
+                } else if (jqXHR.status == 204) {
+                    console.error(jqXHR.status, textStatus);
+                    $("#response-zone").text(jqXHR.status + " " + textStatus);
+                }
+            })
+            .always(function (data, textStatus, jqXHR) {
+                $.getJSON(window.location.href + region + "/champion/" + championId)
+                    .done(function (champion) {
+                        $("#response-zone").append("<div class='col-xs-12'><p>" +
+                            "<img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + champion.name + "' class='top-img'><br><span id='champion-name'>" +
+                            champion.name +
+                            "</span><br>Grade:<br><span id='champion-grade'>" +
+                            (champion.highestGrade || "None") +
+                            "</span></p></div>");
+                    });
+            });
     });
 });

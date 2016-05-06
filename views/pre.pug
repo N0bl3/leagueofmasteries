@@ -1,14 +1,34 @@
 doctype html
-html(lang="en")
+//if lt IE 7
+  html.no-js.lt-ie9.lt-ie8.lt-ie7(lang='')  
+//if IE 7
+  html.no-js.lt-ie9.lt-ie8(lang='')  
+//if IE 8
+  html.no-js.lt-ie9(lang='')  
+// [if gt IE 8] <!
+html.no-js(lang='en')
+  // <![endif]
   head
     meta(charset="UTF-8")
     meta(http-equiv="X-UA-Compatible" content="IE=edge")
     meta(name="viewport" content="width=device-width, initial-scale=1")
+    meta(name='description', content='')
+    meta(name='author', content='Alexandre Noble')
+    link(rel='apple-touch-icon', href='')
     title LeagueOfMasteries
+    style.
+      body {
+      padding-top: 50px;
+      padding-bottom: 20px;
+      }
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous")
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous")
     link(rel="stylesheet" href="main.css")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js")
   body
+    //if IE
+      script(src='https://cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js')
+      script(src='https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js')
     div.container-fluid
       div.row.text-center
         form#summ-by-name.navbar-form.navbar-left(role="search")

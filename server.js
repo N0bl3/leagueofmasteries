@@ -4,7 +4,6 @@ var express = require('express');
 var cfenv = require('cfenv');
 var bodyParser = require('body-parser');
 var pug = require('pug');
-var redis= require('redis');
 var app = express();
 
 var appEnv = cfenv.getAppEnv();
@@ -24,28 +23,28 @@ var champions;
 
 function regionToPlatformId(region) {
 	switch (region) {
-		case "eune":
-			return "eun1";
-		case "euw":
-			return "euw1";
-		case "lan":
-			return "la1";
-		case "las":
-			return "la2";
-		case "oce":
-			return "oce1";
-		case "na":
-			return "na1";
-		case "jp":
-			return "jp1";
-		case "br":
-			return "br1";
-		case "ru":
-			return "ru";
-		case "tr":
-			return "tr1";
-		case "kr":
-			return "kr";
+	case "eune":
+		return "eun1";
+	case "euw":
+		return "euw1";
+	case "lan":
+		return "la1";
+	case "las":
+		return "la2";
+	case "oce":
+		return "oce1";
+	case "na":
+		return "na1";
+	case "jp":
+		return "jp1";
+	case "br":
+		return "br1";
+	case "ru":
+		return "ru";
+	case "tr":
+		return "tr1";
+	case "kr":
+		return "kr";
 	}
 }
 
@@ -114,7 +113,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 					profileIconId: body.profileIconId,
 					id: body.id,
 					champions: champions
-				}, function(err, html){
+				}, function (err, html) {
 					if (!err) {
 						res.send(html);
 					} else {
@@ -128,11 +127,10 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 			}
 		});
 	}
-//	Take into account script and style files
 });
 
 //Get a champion mastery by player id and champion id. Response code 204 means there were no masteries found for given player id or player id and champion id combination. (RPC)
-app.get("/:region/pid/:playerId/cid/:championId", function(req, res){
+app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId) && !isNaN(req.params.championId)) {
 		var region = req.params.region;
@@ -143,7 +141,7 @@ app.get("/:region/pid/:playerId/cid/:championId", function(req, res){
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/champion/" + championId + "?" + api,
 			method: "GET",
 			json: true
-		}, function (error, response, body){
+		}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				body.championName = champIdToChampObject(body.championId).name;
 				res.send(body);
@@ -259,6 +257,18 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 				res.sendStatus(response.statusCode);
 			}
 		});
+	} else {
+		res.sendStatus(400);
+	}
+});
+
+//Get data on a specific champion
+app.get("/:region/champion/:championId", function (req, res) {
+	console.log(req.params);
+	var region = req.params.region;
+	var championId = req.params.championId;
+	if (isRegion(req.params.region) && !isNaN(req.params.championId)) {
+		res.send(champIdToChampObject(championId));
 	} else {
 		res.sendStatus(400);
 	}
