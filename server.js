@@ -24,27 +24,27 @@ var champions;
 function regionToPlatformId(region) {
 	switch (region) {
 	case "eune":
-		return "eun1";
+		return "EUN1";
 	case "euw":
-		return "euw1";
+		return "EUW1";
 	case "lan":
-		return "la1";
+		return "LA1";
 	case "las":
-		return "la2";
+		return "LA2";
 	case "oce":
-		return "oce1";
+		return "OCE1";
 	case "na":
-		return "na1";
+		return "NA1";
 	case "jp":
-		return "jp1";
+		return "JP1";
 	case "br":
-		return "br1";
+		return "BR1";
 	case "ru":
-		return "ru";
+		return "RU";
 	case "tr":
-		return "tr1";
+		return "TR1";
 	case "kr":
-		return "kr";
+		return "KR";
 	}
 }
 
@@ -248,14 +248,17 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 		var region = req.params.region;
 		var platformId = regionToPlatformId(region);
 		var playerId = req.params.playerId;
+						console.log("https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api);
 		request({
 			url: "https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api,
 			method: "GET",
 			json: true
 		}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
+				console.log(body);
 				res.send(body.participants);
 			} else {
+				console.error(response);
 				console.error("Error at endpoint : /:region/pid/:playerId/game-team\nStatus Code : " + response.statusCode);
 				res.sendStatus(response.statusCode);
 			}

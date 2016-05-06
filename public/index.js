@@ -128,11 +128,6 @@ $(document).ready(function () {
         event.preventDefault();
         var submission = $(this).serializeArray();
         var championId = submission[0].value;
-        var championName = "",
-            championLevel = "",
-            championPoints = "",
-            highestGrade = "",
-            lastPlayTime = "";
 
         $.getJSON(window.location.href + region + "/pid/" + playerId + "/cid/" + championId)
             .done(function (data, textStatus, jqXHR) {
@@ -152,12 +147,13 @@ $(document).ready(function () {
                 }
             })
             .always(function (data, textStatus, jqXHR) {
-                $.getJSON(window.location.href + region + "/champion/" + championId + "?friend=false")
+                $.getJSON(window.location.href + region + "/champion/" + championId)
                     .done(function (champion) {
-                            
+                        var championName = champion.name;
+                        
                         $("#response-zone").append("<div class='row'><div class='col-xs-4 col-xs-offset-4 friend-compare'>" +
-                        "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + champion.name + "' class='top-img'><br><span id='champion-name'>" +
-                        champion.name +
+                        "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'><br><span id='champion-name'>" +
+                        championName +
                         "</span>" +
                         "<br>Compare with a friend :</p>" +
                         "<form id='friend-by-name'><div class='form-group'>" +
@@ -213,11 +209,10 @@ $(document).ready(function () {
 					            .done(function (data, textStatus, jqXHR) {
 					                if (jqXHR.status == 200) {
 					                    console.log(data);
-					                    championName = data.championName;
-					                    championLevel = data.championLevel;
-					                    championPoints = data.championPoints;
-					                    highestGrade = data.highestGrade;
-					                    lastPlayTime = data.lastPlayTime;
+					                    var championLevel = data.championLevel;
+					                    var championPoints = data.championPoints;
+					                    var highestGrade = data.highestGrade;
+					                    var lastPlayTime = data.lastPlayTime;
 					                    $(".friend" + counter).append("<p>" +
 					                        json.name +
 					                        "<br>Level : " + championLevel +
@@ -245,8 +240,56 @@ $(document).ready(function () {
     $("#get-game-team-mastery").click(function (event) {
         event.preventDefault();
         $.getJSON(window.location.href + region + "/pid/" + playerId + "/game-team")
-            .done(function (participants) {
-                console.log(participants);
+            .done(function (players) {
+                console.log(players);
+                $("#response-zone").text("");
+                
+                $("#response-zone").append("<div class='row blue-side'></div>");
+                $("#response-zone").append("<div class='row red-side'></div>");
+                
+                var player;
+                for(player in players){
+                    console.log(player);
+                    (function(){
+                    var counter = player;
+                    $.getJSON(window.location.href + region + "/champion/" + players[counter].championId)
+                    .done(function(champion){
+                        var championName = champion.name;
+	                    $.getJSON(window.location.href + region + "/pid/" + players[counter].summonerId + "/cid/" + players[counter].championId)
+						            .done(function (data, textStatus, jqXHR) {
+						                if (jqXHR.status == 200) {
+						                    console.log(data);
+						                    var championLevel = data.championLevel;
+						                    var championPoints = data.championPoints;
+						                    var highestGrade = data.highestGrade;
+						                    var lastPlayTime = data.lastPlayTime;
+						                    if (players[counter].teamId == 100){
+						                    $(".blue-side").append("<div class='col-xs-5ths friend" + counter + "'><p>" +
+						                        players[counter].summonerName +
+	                                            "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" + championName +
+	                                            "<br>Level : " + championLevel +
+	                                            "<br>Points:" + championPoints +
+	                                            "<br>Grade : " + highestGrade +
+	                                            "</p>" +
+	                                            "</div>");
+	                                        } else if (players[counter].teamId == 200){
+						                    $(".red-side").append("<div class='col-xs-5ths friend" + counter + "'><p>" +
+						                        players[counter].summonerName +
+	                                            "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" + championName +
+	                                            "<br>Level : " + championLevel +
+	                                            "<br>Points:" + championPoints +
+	                                            "<br>Grade : " + highestGrade +
+	                                            "</p>" +
+	                                            "</div>");
+	                                        }
+						                } else if (jqXHR.status == 204) {
+						                    console.error(jqXHR.status, textStatus);
+						                    $(".friend" + counter).append(jqXHR.status + " " + textStatus);
+						                }
+						            });
+                    });
+                    })();
+                }
             });
     });
 
