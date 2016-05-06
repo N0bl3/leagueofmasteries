@@ -23,28 +23,28 @@ var champions;
 
 function regionToPlatformId(region) {
 	switch (region) {
-	case "eune":
-		return "EUN1";
-	case "euw":
-		return "EUW1";
-	case "lan":
-		return "LA1";
-	case "las":
-		return "LA2";
-	case "oce":
-		return "OCE1";
-	case "na":
-		return "NA1";
-	case "jp":
-		return "JP1";
-	case "br":
-		return "BR1";
-	case "ru":
-		return "RU";
-	case "tr":
-		return "TR1";
-	case "kr":
-		return "KR";
+		case "eune":
+			return "EUN1";
+		case "euw":
+			return "EUW1";
+		case "lan":
+			return "LA1";
+		case "las":
+			return "LA2";
+		case "oce":
+			return "OCE1";
+		case "na":
+			return "NA1";
+		case "jp":
+			return "JP1";
+		case "br":
+			return "BR1";
+		case "ru":
+			return "RU";
+		case "tr":
+			return "TR1";
+		case "kr":
+			return "KR";
 	}
 }
 
@@ -248,7 +248,7 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 		var region = req.params.region;
 		var platformId = regionToPlatformId(region);
 		var playerId = req.params.playerId;
-						console.log("https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api);
+		console.log("https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api);
 		request({
 			url: "https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api,
 			method: "GET",
@@ -271,9 +271,9 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 //Get data on a specific champion
 app.get("/:region/champion/:championId", function (req, res) {
 	console.log(req.params);
-	var region = req.params.region;
-	var championId = req.params.championId;
 	if (isRegion(req.params.region) && !isNaN(req.params.championId)) {
+		var region = req.params.region;
+		var championId = req.params.championId;
 		res.send(champIdToChampObject(championId));
 	} else {
 		res.sendStatus(400);
