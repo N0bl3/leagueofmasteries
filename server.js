@@ -103,7 +103,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 			method: "GET",
 			json: true
 		}, function (error, response, body) {
-			if (!error && response.statusCode == 200) {
+			if (!error && response.statusCode == 200 && req.query.friend !== "true") {
 				console.log("Body:", body);
 				body = body[summonerName];
 				res.render("index.pug", {
@@ -121,6 +121,9 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 						res.end(err.message);
 					}
 				});
+			} else if (!error && response.statusCode == 200 && req.query.friend === "true") {
+				console.log("Friend: " + body);
+				res.send(body);
 			} else {
 				console.error("Error at endpoint : /:region/:summonerName\nStatus Code : " + response.statusCode);
 				res.sendStatus(response.statusCode);
@@ -273,6 +276,13 @@ app.get("/:region/champion/:championId", function (req, res) {
 		res.sendStatus(400);
 	}
 });
+
+//Compare with a friend
+//Get past games teams
+//Get each team member mastery for chosen champion
+//Get each team member best champion
+//Get best ranked player for a given champion
+//Recommend champion based on style
 
 // Runs the server
 app.listen(appEnv.port, function () {
