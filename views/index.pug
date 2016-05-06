@@ -59,7 +59,7 @@ div.container-fluid
           option(title=champion.key value=champion.id)= champion.name
         input(type="submit" value="OK?")
   div.row.text-center#response-zone
-script(type="text/javascript") var options ={playerId: #{id}, playerName: "#{playerName}", region: "#{region}"};
+script(type="text/javascript") var options ={playerId: #{id}, playerName: "#{playerName}", region: "#{region}", summonerName: "#{summonerName}"};
 script(type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
 script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous")
 script(src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.3.11/parsley.min.js")

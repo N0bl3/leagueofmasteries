@@ -4,6 +4,7 @@
 $(document).ready(function () {
     var playerId = options.playerId || "",
         playerName = options.playerName || "",
+        playerDisplayedName = options.summonerName || "",
         region = options.region || "",
         playerScore;
         
@@ -30,7 +31,7 @@ $(document).ready(function () {
                         } else {
                             progressClass = "progress-bar-success";
                         }
-                        $("a.navbar-brand").text(playerName + " " + playerId);
+
                         $("#player-score").append("<h4>Total score : " + playerScore + "</h4>")
                             .append('<div class="progress">' +
                                 '<div class="progress-bar ' + progressClass + '" role="progressbar" aria-valuenow="' + percentage + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percentage + '%;">' +
@@ -176,7 +177,10 @@ $(document).ready(function () {
                         "<button class='btn btn-default' type='submit'>Search</button></div></div></div>");
 
                         $("#response-zone").append("<div class='col-xs-5ths friend0'><p>" +
-                            "Grade:<br><span id='champion-grade'>" +
+                            playerDisplayedName +
+					        "<br>Level : " + championLevel +
+					        "<br>Points : " + championPoints +
+                            "<br>Grade : <span id='champion-grade'>" +
                             (highestGrade || "None") +
                             "</span></p></div>");
 
@@ -195,12 +199,13 @@ $(document).ready(function () {
                             event.preventDefault();
                             
                             if (friendCounter < 4){
-                            var counter = ++friendCounter;
                             var submission = $(this).serializeArray();
                             friendName = submission[0].value;
                             friendRegion = submission[1].value;
 							$.getJSON(window.location.href + friendRegion + "/sname/" + friendName + "?friend=true")
-                            .done(function (json) {
+                            .done(function (json, textStatus, jqXHR) {
+                                if (jqXHR.status != 404){
+                                var counter = ++friendCounter;
                                 console.log(json);
                                 json = json[friendName];
 						        friendId = json.id;
@@ -214,15 +219,20 @@ $(document).ready(function () {
 					                    highestGrade = data.highestGrade;
 					                    lastPlayTime = data.lastPlayTime;
 					                    $(".friend" + counter).append("<p>" +
-                                            "Grade:<br><span id='champion-grade'>" +
+					                        json.name +
+					                        "<br>Level : " + championLevel +
+					                        "<br>Points : " + championPoints +
+                                            "<br>Grade : <span id='champion-grade'>" +
                                             (highestGrade || "None") +
                                             "</span></p>");
 					                } else if (jqXHR.status == 204) {
 					                    console.error(jqXHR.status, textStatus);
 					                    $(".friend" + counter).append(jqXHR.status + " " + textStatus);
 					                }
-
 					            });
+					            } else {
+					                console.error(jqXHR.status + " " + textStatus);
+					            }
                             });
                             } else {
                                 alert("You reached the maximum amount of friends! Try reloading a new champ. A smoother interaction will be available soon.");
