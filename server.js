@@ -1,22 +1,23 @@
-/*jshint esnext: true, devel: true, node: true*/
-var request = require('request');
-var RateLimiter = require('request-rate-limiter');
-var limiter = new RateLimiter({
-	rate: 10,
+/*eslint-env node, es6, express*/
+
+let request = require('request');
+let RateLimiter = require('request-rate-limiter');
+let limiter = new RateLimiter({
+	rate: 1000,
 	interval: 10,
 	backOffCode: 429,
 	backOffTime: 1,
 	maxWaitingTime: 120
 });
-var express = require('express');
-var cfenv = require('cfenv');
-var bodyParser = require('body-parser');
-var pug = require('pug');
-var app = express();
+let express = require('express');
+let cfenv = require('cfenv');
+let bodyParser = require('body-parser');
+let pug = require('pug');
+let app = express();
 
-var appEnv = cfenv.getAppEnv();
+let appEnv = cfenv.getAppEnv();
 
-var api = "api_key=" + process.env.RIOT_API;
+let api = "api_key=" + process.env.RIOT_API;
 app.engine('pug', pug.renderFile);
 app.set('views', __dirname + '/views');
 app.use(express.static('public'));
@@ -27,7 +28,7 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-var champions;
+let champions;
 
 function regionToPlatformId(region) {
 	switch (region) {
@@ -57,7 +58,7 @@ function regionToPlatformId(region) {
 }
 
 function champIdToChampObject(champId) {
-	for (var champion in champions) {
+	for (let champion in champions) {
 		if (champId == champions[champion].id) {
 			return champions[champion];
 		}
@@ -74,20 +75,22 @@ function isLettersAndNumbers(str) {
 }
 
 //Get champions list
-limiter.request({
-	url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=image&" + api,
-	method: "GET",
-	json: true
-}, function (error, response) {
-	if (!error && response.statusCode == 200) {
-		champions = response.body.data;
-		for (var champion in champions) {
-			console.log(champion);
+function getChampionsList() {
+	limiter.request({
+		url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=image,tags&" + api,
+		method: "GET",
+		json: true
+	}, function (error, response) {
+		if (!error && response.statusCode == 200) {
+			champions = response.body.data;
+			console.log("Champions retrieved. First champion: ", champions["Aatrox"]);
+		} else {
+			console.error("Error retrieving champions\nStatus Code : " + response.statusCode);
 		}
-	} else {
-		console.error("Error retrieving champions\nStatus Code : " + response.statusCode);
-	}
-});
+	});
+}
+getChampionsList();
+var championFetch = setInterval(getChampionsList, 86400);
 
 app.get("/", function (req, res) {
 	res.render('pre.pug', {}, function (err, html) {
@@ -104,8 +107,8 @@ app.get("/", function (req, res) {
 app.get("/:region/sname/:summonerName", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && isLettersAndNumbers(req.params.summonerName)) {
-		var region = req.params.region;
-		var summonerName = req.params.summonerName;
+		let region = req.params.region;
+		let summonerName = req.params.summonerName;
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.4/summoner/by-name/" + summonerName + "?" + api,
 			method: "GET",
@@ -113,7 +116,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 		}, function (error, response) {
 			if (!error && response.statusCode == 200 && req.query.friend !== "true") {
 				console.log("Body:", response.body);
-				var body = response.body[summonerName];
+				let body = response.body[summonerName];
 				res.render("index.pug", {
 					region: region,
 					playerName: summonerName,
@@ -144,10 +147,10 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId) && !isNaN(req.params.championId)) {
-		var region = req.params.region;
-		var platformId = regionToPlatformId(region);
-		var playerId = req.params.playerId;
-		var championId = req.params.championId;
+		let region = req.params.region;
+		let platformId = regionToPlatformId(region);
+		let playerId = req.params.playerId;
+		let championId = req.params.championId;
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/champion/" + championId + "?" + api,
 			method: "GET",
@@ -172,9 +175,9 @@ app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
 app.get("/:region/pid/:playerId/champions", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
-		var region = req.params.region;
-		var platformId = regionToPlatformId(req.params.region);
-		var playerId = req.params.playerId;
+		let region = req.params.region;
+		let platformId = regionToPlatformId(req.params.region);
+		let playerId = req.params.playerId;
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/champions" + "?" + api,
 			method: "GET",
@@ -199,9 +202,9 @@ app.get("/:region/pid/:playerId/champions", function (req, res) {
 app.get("/:region/pid/:playerId", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
-		var region = req.params.region;
-		var platformId = regionToPlatformId(region);
-		var playerId = req.params.playerId;
+		let region = req.params.region;
+		let platformId = regionToPlatformId(region);
+		let playerId = req.params.playerId;
 		console.log(region, platformId, playerId);
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/score" + "?" + api,
@@ -223,12 +226,12 @@ app.get("/:region/pid/:playerId", function (req, res) {
 
 //Get specified number of top champion mastery entries sorted by number of champion points descending (RPC)
 app.get("/:region/pid/:playerId/top", function (req, res) {
-	var count = req.query.count || 5;
+	let count = req.query.count || 5;
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
-		var region = req.params.region;
-		var platformId = regionToPlatformId(req.params.region);
-		var playerId = req.params.playerId;
+		let region = req.params.region;
+		let platformId = regionToPlatformId(req.params.region);
+		let playerId = req.params.playerId;
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/topchampions" + "?count=" + count + "&" + api,
 			method: "GET",
@@ -253,10 +256,9 @@ app.get("/:region/pid/:playerId/top", function (req, res) {
 app.get("/:region/pid/:playerId/game-team", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
-		var region = req.params.region;
-		var platformId = regionToPlatformId(region);
-		var playerId = req.params.playerId;
-		console.log("https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api);
+		let region = req.params.region;
+		let platformId = regionToPlatformId(region);
+		let playerId = req.params.playerId;
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/" + platformId + "/" + playerId + "?" + api,
 			method: "GET",
@@ -280,20 +282,118 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 app.get("/:region/champion/:championId", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.championId)) {
-		var region = req.params.region;
-		var championId = req.params.championId;
+		let championId = req.params.championId;
 		res.send(champIdToChampObject(championId));
 	} else {
 		res.sendStatus(400);
 	}
 });
 
-//Compare with a friend
 //Get past games teams
 //Get each team member mastery for chosen champion
 //Get each team member best champion
 //Get best ranked player for a given champion
 //Recommend champion based on style
+app.get("/:region/pid/:playerId/recommended", function (req, res) {
+	console.log(req.params);
+	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
+		let region = req.params.region;
+		let platformId = regionToPlatformId(region);
+		let playerId = req.params.playerId;
+		limiter.request({
+			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/champions" + "?" + api,
+			method: "GET",
+			json: true
+		}, function (error, response) {
+			if (!error && response.statusCode == 200) {
+				let scoreByRole = {};
+				let possessedChampions = [];
+
+				response.body.forEach(function (champion) {
+					possessedChampions.push(champion.championId);
+				});
+				possessedChampions.forEach(function (championId) {
+					let championTags;
+
+					for (let champion in champions) {
+						if (championId == champions[champion].id) {
+							championTags = champions[champion].tags;
+
+							scoreByRole[championTags[0]] = scoreByRole[championTags[0]] ? scoreByRole[championTags[0]] + 2 : 2;
+
+							console.log(championId, scoreByRole);
+					        if (championTags[1]) {
+						        scoreByRole[championTags[1]] = scoreByRole[championTags[1]] ? scoreByRole[championTags[1]] + 1 : 1;
+					        }
+							break;
+						}
+					}
+				});
+
+				let best = [["lol", "lol"], [0, 0]];
+				
+				for (let role in scoreByRole){
+					let score = scoreByRole[role];
+					
+					if (score > best[1][1]) {
+						if (score > best[1][0]) {
+							best[0][1] = best[0][0];
+							best[0][0] = role;
+							best[1][1] = best[1][0];
+							best[1][0] = score;
+						} else {
+							best[0][1] = role;
+							best[1][1] = score;
+						}
+					} else {
+						console.log("Nope! Score", score, "Role", role);
+					}
+				}
+
+
+				let specialistsChampions = [];
+				let lessSpecialistsChampions = [];
+				let diversityChampions = [];
+
+				for (let champion in champions) {
+
+					if (best[0][0] == champions[champion].tags[0]) {
+						if (best[0][1] == champions[champion].tags[1]) {
+							specialistsChampions.unshift(champions[champion]);
+
+						} else {
+							lessSpecialistsChampions.push(champions[champion]);
+						}
+					} else if (best[0][0] != champions[champion].tags[0] && best[0][0] != champions[champion].tags[1] && best[0][1] != champions[champion].tags[0] && best[0][1] != champions[champion].tags[1]) {
+						diversityChampions.push(champions[champion]);
+					}
+				}
+				let chooseOne = function (array) {
+					let len = array.length;
+					let index = Math.floor(Math.random() * len);
+					console.log("index", index, "Chosen", array[index]);
+					return array[index];
+				};
+				
+				let specialist = specialistsChampions.length > 0 ? chooseOne(specialistsChampions) : lessSpecialistsChampions.length > 0 ? chooseOne(lessSpecialistsChampions) : "";
+				let nemesis = diversityChampions.length > 0 ? chooseOne(diversityChampions) : "";
+				
+				res.send(JSON.stringify({
+					best: best[0][0],
+					secondBest: best[0][1],
+					specialist: specialist,
+					nemesis: nemesis
+				}));
+
+			} else {
+				console.error("Error at endpoint : /:platformId/pid/:playerId/recommended\nStatus Code : " + response.statusCode);
+				res.sendStatus(response.statusCode);
+			}
+		});
+	} else {
+		res.sendStatus(400);
+	}
+});
 
 // Runs the server
 app.listen(appEnv.port, function () {
