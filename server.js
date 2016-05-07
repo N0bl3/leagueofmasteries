@@ -345,8 +345,6 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 							best[0][1] = role;
 							best[1][1] = score;
 						}
-					} else {
-						console.log("Nope! Score", score, "Role", role);
 					}
 				}
 
@@ -371,7 +369,6 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 				let chooseOne = function (array) {
 					let len = array.length;
 					let index = Math.floor(Math.random() * len);
-					console.log("index", index, "Chosen", array[index]);
 					return array[index];
 				};
 				
