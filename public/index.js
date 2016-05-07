@@ -184,6 +184,19 @@ $(document).ready(function () {
         })();
     }
 
+    function renderRecommendedChampion(region, playerId){
+        $.getJSON(window.location.href + region + "/pid/" + playerId + "/recommended")
+        .done(function(data){
+            var specialist = data.specialist;
+            var nemesis = data.nemesis;
+            $("#recommended").append("<div class='col-xs-12'><p>Best champions to get next :</div>" + 
+            "<div class='text-center col-xs-12 col-md-3'><p>Become a specialist with a " + data.best + " " + data.secondBest + "</p></div>" + 
+            "<div class='text-center col-xs-12 col-md-3'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/champion/" + specialist.image.full + "' alt='" + specialist.name + "'></p></div>" + 
+            "<div class='text-center col-xs-12 col-md-3'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/champion/" + nemesis.image.full + "' alt='" + nemesis.name + "'></p></div>" + 
+            "<div class='text-center col-xs-12 col-md-3'><p>Or become polyvalent with a " + nemesis.tags[0] + " " + (nemesis.tags[1] || ".") + "</p></div>");
+        });
+    }
+
     $("#response-zone").text("");
     $("#response-zone").append("<h3>ID: " + playerId + " - " + playerName + "</h3>");
     $.getJSON(window.location.href + region + "/pid/" + playerId)
@@ -204,14 +217,11 @@ $(document).ready(function () {
                 progressClass = "progress-bar-success";
             }
 
-            $("#player-score").append("<h4>Total score : " + playerScore + "</h4>")
+            $("#player-score").append("<h4>Mastery score : " + playerScore + "/650</h4>")
                 .append('<div class="progress">' +
                     '<div class="progress-bar ' + progressClass + '" role="progressbar" aria-valuenow="' + percentage + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percentage + '%;">' +
                     '<span class="sr-only">' + percentage + '% Complete</span>' +
-                    '</div></div>')
-                .append("<div class='col-xs-12'><p>" +
-                    "You have " + playerScore + "/650 to get all champs at max level" +
-                    "</p></div>");
+                    '</div></div>');
         });
     $(".nav>li>a").removeAttr("disabled");
 
@@ -220,6 +230,8 @@ $(document).ready(function () {
             progression = arr;
             renderProgression(arr);
         });
+
+    renderRecommendedChampion(region, playerId);
 
     $("form#summ-by-name").submit(function (event) {
         event.preventDefault();
@@ -260,13 +272,17 @@ $(document).ready(function () {
 
         var submission = $(this).serializeArray();
         var championId = submission[0].value;
-        if (!byChampion || byChampion.championId != championId) {
+        if (championId != 0 && (!byChampion || byChampion.championId != championId)) {
+            console.info(championId);
             console.log(byChampion);
             $.getJSON(window.location.href + region + "/pid/" + playerId + "/cid/" + championId)
                 .done(function (data, textStatus, jqXHR) {
                     byChampion = data;
                     renderByChampion(championId, data, textStatus, jqXHR);
                 });
+        } else if (championId == 0) {
+            alert("Choose a champion");
+            console.warn("Choose a champion");
         } else {
             renderByChampion(championId, byChampion);
         }
@@ -277,24 +293,30 @@ $(document).ready(function () {
         $("#response-zone").text("");
         if (!byGameTeam) {
             $.getJSON(window.location.href + region + "/pid/" + playerId + "/game-team")
-                .done(function (players) {
+                .done(function (players, textStatus, jqXHR) {
+
+                    if(jqXHR.status == 200){
                     byGameTeam = players;
                     console.log(players);
-                    $("#response-zone").text("");
 
                     $("#response-zone").append("<div class='row blue-side'></div>");
                     $("#response-zone").append("<div class='row red-side'></div>");
 
                     var player;
-                    for (player in players) {
-                        console.log(player);
+                    for (var player in players) {
                         renderByGameTeam(players, player);
                     }
+                    } else {
+                        console.error(jqHXR.status, textStatus);
+                    }
+                })
+                .fail(function(error){
+                    console.error(error.status, error.responseText, error);
+                    $("#response-zone").text("The player is probably not in game or the game's info are not available yet. If you are sure about it, try again in a minute. See console for details.");
                 });
         } else {
             var player;
             for (player in byGameTeam) {
-                console.log(player);
                 renderByGameTeam(byGameTeam, player);
             }
         }
