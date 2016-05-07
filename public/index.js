@@ -150,39 +150,34 @@ $(document).ready(function () {
     function renderByGameTeam(players, player) {
         return (function () {
             var counter = player;
+
             $.getJSON(window.location.href + region + "/champion/" + players[counter].championId)
                 .done(function (champion) {
                     var championName = champion.name;
                     $.getJSON(window.location.href + region + "/pid/" + players[counter].summonerId + "/cid/" + players[counter].championId)
                         .done(function (data, textStatus, jqXHR) {
-                            if (jqXHR.status == 200) {
+                            if (jqXHR.status == 200 || jqXHR.status == 204) {
                                 console.log(data);
-                                var championLevel = data.championLevel;
-                                var championPoints = data.championPoints;
-                                var highestGrade = data.highestGrade;
+                                var championLevel = data ? data.championLevel : "None";
+                                var championPoints = data ? data.championPoints : "None";
+                                var highestGrade = data ? data.highestGrade : "None";
                                 //                                var lastPlayTime = data.lastPlayTime;
+                                var str = "<div class='col-xs-5ths friend" + counter + "'><p>" +
+                                    players[counter].summonerName +
+                                    "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" + championName +
+                                    "<br>Level : " + championLevel +
+                                    "<br>Points:" + championPoints +
+                                    "<br>Grade : " + highestGrade +
+                                    "</p>" +
+                                    "</div>";
                                 if (players[counter].teamId == 100) {
-                                    $(".red-side").append("<div class='col-xs-5ths friend" + counter + "'><p>" +
-                                        players[counter].summonerName +
-                                        "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" + championName +
-                                        "<br>Level : " + championLevel +
-                                        "<br>Points:" + championPoints +
-                                        "<br>Grade : " + highestGrade +
-                                        "</p>" +
-                                        "</div>");
+                                    $(".red-side").append(str);
                                 } else if (players[counter].teamId == 200) {
-                                    $(".blue-side").append("<div class='col-xs-5ths friend" + counter + "'><p>" +
-                                        players[counter].summonerName +
-                                        "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" + championName +
-                                        "<br>Level : " + championLevel +
-                                        "<br>Points:" + championPoints +
-                                        "<br>Grade : " + highestGrade +
-                                        "</p>" +
-                                        "</div>");
+                                    $(".blue-side").append(str);
                                 }
-                            } else if (jqXHR.status == 204) {
+                                console.log(jqXHR.status, textStatus);
+                            } else {
                                 console.error(jqXHR.status, textStatus);
-                                $(".friend" + counter).append(jqXHR.status + " " + textStatus);
                             }
                         });
                 });
@@ -220,6 +215,11 @@ $(document).ready(function () {
         });
     $(".nav>li>a").removeAttr("disabled");
 
+    $.getJSON(window.location.href + region + "/pid/" + playerId + "/champions")
+        .done(function (arr) {
+            progression = arr;
+            renderProgression(arr);
+        });
 
     $("form#summ-by-name").submit(function (event) {
         event.preventDefault();
@@ -274,6 +274,7 @@ $(document).ready(function () {
 
     $("#get-game-team-mastery").click(function (event) {
         event.preventDefault();
+        $("#response-zone").text("");
         if (!byGameTeam) {
             $.getJSON(window.location.href + region + "/pid/" + playerId + "/game-team")
                 .done(function (players) {
