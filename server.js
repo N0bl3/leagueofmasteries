@@ -1,5 +1,6 @@
+/*jshint unused: false, esnext: true, node: true*/
 /*eslint-env node, es6, express*/
-let Cloudant = require('cloudant');
+const fs = require("fs");
 let request = require('request');
 let RateLimiter = require('request-rate-limiter');
 let limiter = new RateLimiter({
@@ -12,13 +13,6 @@ let limiter = new RateLimiter({
 let express = require('express');
 let cfenv = require('cfenv');
 let appEnv = cfenv.getAppEnv();
-let {
-	username, password, host, port, url
-} = appEnv.getServiceCreds("LeagueOfMasteries-Cloudant NoSQL DB");
-let cloudant = Cloudant({
-	account: username,
-	password: password
-});
 let bodyParser = require('body-parser');
 let pug = require('pug');
 let app = express();
@@ -80,8 +74,7 @@ function isLettersAndNumbers(str) {
 	return /^[a-zA-Z0-9]+$/.test(str);
 }
 
-//Get champions list
-function getChampionsList() {
+function getChampionsListFromAPI() {
 	limiter.request({
 		url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=image,tags&" + api,
 		method: "GET",
@@ -89,14 +82,78 @@ function getChampionsList() {
 	}, function (error, response) {
 		if (!error && response.statusCode == 200) {
 			champions = response.body.data;
-			console.log("Champions retrieved. First champion: ", champions["Aatrox"]);
-		} else {
-			console.error("Error retrieving champions\nStatus Code : " + response.statusCode);
+			writeChampionsList(champions);
+			console.log("Champions retrieved. First champion: ", champions.Aatrox);
+			return champions;
 		}
+		throw new Error("Error retrieving champions\nStatus Code : " + response.statusCode);
 	});
 }
-getChampionsList();
-var championFetch = setInterval(getChampionsList, 86400);
+function getChampionsList() {
+	try{
+	fs.readFile("data/champions.json", (err, data) => {
+		if (err) {
+			console.error(err);
+			throw err;
+		}
+		return data;
+		
+	});
+	}catch(err){
+		if (err instanceof Error) {
+			console.log(err);
+			return;
+		}
+		throw new Error("Can't get champions list");
+	}
+}
+function writeChampionsList(champions) {
+	if(champions){
+	try{
+	fs.writeFile("data/champions.json", champions, (err) => {
+		if (err) {
+			throw err;
+		}
+			console.log("Updated champions list.");
+			return;
+	});
+	}catch(err){
+		if (err instanceof Error) {
+			console.log(err);
+			return;
+		}
+		throw new Error("Can't write champions list");
+	}
+	} else {
+		console.log("Nothing to write");
+		return false;
+	}
+}
+
+function initializeWorkspace() {
+	try {
+		fs.mkdir("data", (err) => {
+			if (err) {
+				throw err;
+			}
+		});
+	} catch (err) {
+		if (err instanceof Error) {
+			if (err.code != "EEXIST") {
+			console.log("Error", err);
+			return;
+			}
+			console.log("data dir already exists");
+		}
+		throw new Error("Can't initialize :" + err);
+	}
+	writeChampionsList(champions);
+	console.log("Initialized");
+}
+
+initializeWorkspace();
+getChampionsListFromAPI();
+var championFetch = setInterval(getChampionsListFromAPI, 86400);
 
 app.get("/", function (req, res) {
 	res.render('pre.pug', {}, function (err, html) {
