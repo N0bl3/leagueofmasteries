@@ -60,7 +60,9 @@ $(document).ready(function () {
         if (!champion) {
             champion = champions[championId];
         }
+		$("#response-zone").append('<div class="row social">' +
 
+		    '</div>');
         $("#response-zone").append("<div class='row'><div class='col-xs-4 col-xs-offset-4 friend-compare'>" +
             "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + data.championName + "' class='top-img'><br><span id='champion-name'>" +
             data.championName +
