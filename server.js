@@ -1,5 +1,5 @@
 /*eslint-env node, es6, express*/
-
+let Cloudant = require('cloudant');
 let request = require('request');
 let RateLimiter = require('request-rate-limiter');
 let limiter = new RateLimiter({
@@ -11,11 +11,17 @@ let limiter = new RateLimiter({
 });
 let express = require('express');
 let cfenv = require('cfenv');
+let appEnv = cfenv.getAppEnv();
+let {
+	username, password, host, port, url
+} = appEnv.getServiceCreds("LeagueOfMasteries-Cloudant NoSQL DB");
+let cloudant = Cloudant({
+	account: username,
+	password: password
+});
 let bodyParser = require('body-parser');
 let pug = require('pug');
 let app = express();
-
-let appEnv = cfenv.getAppEnv();
 
 let api = "api_key=" + process.env.RIOT_API;
 app.engine('pug', pug.renderFile);
@@ -144,6 +150,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 });
 
 //Get a champion mastery by player id and champion id. Response code 204 means there were no masteries found for given player id or player id and champion id combination. (RPC)
+//Curently misses highestGrade
 app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
 	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId) && !isNaN(req.params.championId)) {
@@ -158,7 +165,31 @@ app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
 		}, function (error, response) {
 			if (!error && response.statusCode == 200) {
 				response.body.championName = champIdToChampObject(response.body.championId).name;
-				res.send(response.body);
+				let preparedResponse = response.body;
+				//				Gets highest grade for a champion... Temporary fix
+				limiter.request({
+					url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/champions" + "?" + api,
+					method: "GET",
+					json: true
+				}, function (error, response) {
+					if (!error && response.statusCode == 200) {
+						let bestChampions = response.body;
+						for (let i = 0; i < bestChampions.length; i++) {
+							if (preparedResponse.championId == bestChampions[i].championId) {
+								preparedResponse.highestGrade = bestChampions[i].highestGrade;
+								break;
+							}
+						}
+						if (!preparedResponse.highestGrade) {
+							preparedResponse.highestGrade = "None";
+						}
+						res.send(preparedResponse);
+					} else {
+						console.error("Error at endpoint : /:region/pid/:playerId/cid/:championId\nStatus Code : " + response.statusCode);
+						res.sendStatus(response.statusCode);
+					}
+
+				});
 			} else if (!error && response.statusCode == 204) {
 				res.status(204).end(response.statusCode + " : No masteries found for given player id or player id and champion id combination");
 			} else {
@@ -289,9 +320,6 @@ app.get("/:region/champion/:championId", function (req, res) {
 	}
 });
 
-//Get past games teams
-//Get each team member mastery for chosen champion
-//Get each team member best champion
 //Get best ranked player for a given champion
 //Recommend champion based on style
 app.get("/:region/pid/:playerId/recommended", function (req, res) {
@@ -322,19 +350,19 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 							scoreByRole[championTags[0]] = scoreByRole[championTags[0]] ? scoreByRole[championTags[0]] + 2 : 2;
 
 							console.log(championId, scoreByRole);
-					        if (championTags[1]) {
-						        scoreByRole[championTags[1]] = scoreByRole[championTags[1]] ? scoreByRole[championTags[1]] + 1 : 1;
-					        }
+							if (championTags[1]) {
+								scoreByRole[championTags[1]] = scoreByRole[championTags[1]] ? scoreByRole[championTags[1]] + 1 : 1;
+							}
 							break;
 						}
 					}
 				});
 
 				let best = [["lol", "lol"], [0, 0]];
-				
-				for (let role in scoreByRole){
+
+				for (let role in scoreByRole) {
 					let score = scoreByRole[role];
-					
+
 					if (score > best[1][1]) {
 						if (score > best[1][0]) {
 							best[0][1] = best[0][0];
@@ -371,10 +399,10 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 					let index = Math.floor(Math.random() * len);
 					return array[index];
 				};
-				
+
 				let specialist = specialistsChampions.length > 0 ? chooseOne(specialistsChampions) : lessSpecialistsChampions.length > 0 ? chooseOne(lessSpecialistsChampions) : "";
 				let nemesis = diversityChampions.length > 0 ? chooseOne(diversityChampions) : "";
-				
+
 				res.send(JSON.stringify({
 					best: best[0][0],
 					secondBest: best[0][1],

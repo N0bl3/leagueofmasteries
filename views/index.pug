@@ -10,8 +10,8 @@ nav(class="navbar navbar-inverse")
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      - var profileIconUrl = "http://ddragon.leagueoflegends.com/cdn/6.8.1/img/profileicon/" + profileIconId + ".png";
-      a.navbar-brand League of Masteries
+      - var profileIconUrl = "http://ddragon.leagueoflegends.com/cdn/6.9.1/img/profileicon/" + profileIconId + ".png";
+      a.navbar-brand(href='https://leagueofmasteries.eu-gb.mybluemix.net') League of Masteries
     div.collapse.navbar-collapse#navbar-collapse-1
       ul.nav.navbar-nav
         li
@@ -51,18 +51,26 @@ div.container-fluid
   div.row.text-center
     div.col-xs-4.col-xs-offset-4
       p#player-score
-  div.row.text-center#recommended
   div.row.text-center
     form#by-champion
       select(name="champion")
         option(title="None" value=0) Mastery By Champion
         each champion in champions
           option(title=champion.key value=champion.id)= champion.name
-        input(type="submit" value="OK?")
+      input(type="submit" value="OK?")
+  div.row.text-center#recommended
   div.row.text-center#response-zone
 footer.footer
   div.container
-    p.text-muted LeagueOfMasteries isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
+    div.row.text-center
+      div.col-xs-8
+        p.text-muted LeagueOfMasteries isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
+      div.col-xs-4
+        p An app written by Alexandre Noble.
+          br
+          a(href='https://github.com/N0bl3/leagueofmasteries') Github Repo
+          br
+          a(href='mailto:alexandre.noble.pro@gmail.com?subject=About%20LeagueOfMasteries') Suggestions or contact
 script(type="text/javascript") var options ={playerId: #{id}, playerName: "#{playerName}", region: "#{region}", summonerName: "#{summonerName}"};
 script(type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
 script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous")

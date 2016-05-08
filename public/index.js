@@ -16,23 +16,37 @@ $(document).ready(function () {
         $("#response-zone").text("");
         arr.forEach(function (champion) {
             $("#response-zone").append("<div class='col-xs-3'><p>" +
-                "<img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
+                "<img src='http://ddragon.leagueoflegends.com/cdn/6.9.1/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
                 champion.name +
-                "</span><br>Grade:Level<br><span id='champion-grade'>" +
+                "</span><br>Grade : Level<br><span id='champion-grade'>" +
                 (champion.highestGrade || "None") + " : " + (champion.championLevel || 0) +
-                "</span></p></div>");
+                "</span><br>Score : " + champion.championPoints +
+                "</p></div>");
         });
     }
 
     function renderTop(arr) {
         $("#response-zone").text("");
-        arr.forEach(function (champion) {
-            $("#response-zone").append("<div class='col-xs-3'><p>" +
+        $("#response-zone").append("<div class='row text-center top-first'></div>");
+        $("#response-zone").append("<div class='row text-center top-second'></div>");
+        $("#response-zone").append("<div class='row text-center top-third'></div>");
+
+        arr.forEach(function (champion, index) {
+            var str = "<div class='col-xs-3'><p>" +
                 "<img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + champion.name + "' class='top-img'><br><span id='champion-name'>" +
                 champion.name +
-                "</span><br>Grade:<br><span id='champion-grade'>" +
+                "</span>" +
+                "<br>Score : " + champion.championPoints +
+                "<br>Grade : <span id='champion-grade'>" +
                 (champion.highestGrade || "None") +
-                "</span></p></div>");
+                "</span></p></div>";
+            if (index < 4) {
+                $(".top-first").append(str);
+            } else if (index < 8) {
+                $(".top-second").append(str);
+            } else {
+                $(".top-third").append(str);
+            }
         });
     }
 
@@ -60,9 +74,9 @@ $(document).ready(function () {
         if (!champion) {
             champion = champions[championId];
         }
-		$("#response-zone").append('<div class="row social">' +
+        $("#response-zone").append('<div class="row social">' +
 
-		    '</div>');
+            '</div>');
         $("#response-zone").append("<div class='row'><div class='col-xs-4 col-xs-offset-4 friend-compare'>" +
             "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + data.championName + "' class='top-img'><br><span id='champion-name'>" +
             data.championName +
@@ -159,16 +173,17 @@ $(document).ready(function () {
                     $.getJSON(window.location.href + region + "/pid/" + players[counter].summonerId + "/cid/" + players[counter].championId)
                         .done(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == 200 || jqXHR.status == 204) {
-                                console.log(data);
+                                console.log(data || "No mastery data found");
                                 var championLevel = data ? data.championLevel : "None";
                                 var championPoints = data ? data.championPoints : "None";
                                 var highestGrade = data ? data.highestGrade : "None";
                                 //                                var lastPlayTime = data.lastPlayTime;
                                 var str = "<div class='col-xs-5ths friend" + counter + "'><p>" +
                                     players[counter].summonerName +
-                                    "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" + championName +
+                                    "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + championName + "' class='top-img'>" +
+                                    "<br>" + championName +
                                     "<br>Level : " + championLevel +
-                                    "<br>Points:" + championPoints +
+                                    "<br>Points : " + championPoints +
                                     "<br>Grade : " + highestGrade +
                                     "</p>" +
                                     "</div>";
@@ -186,17 +201,17 @@ $(document).ready(function () {
         })();
     }
 
-    function renderRecommendedChampion(region, playerId){
+    function renderRecommendedChampion(region, playerId) {
         $.getJSON(window.location.href + region + "/pid/" + playerId + "/recommended")
-        .done(function(data){
-            var specialist = data.specialist;
-            var nemesis = data.nemesis;
-            $("#recommended").append("<div class='col-xs-12'><p>Best champions to get next :</div>" + 
-            "<div class='text-center col-xs-12 col-md-3'><p>Become a specialist with a " + data.best + " " + data.secondBest + "</p></div>" + 
-            "<div class='text-center col-xs-12 col-md-3'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/champion/" + specialist.image.full + "' alt='" + specialist.name + "'></p></div>" + 
-            "<div class='text-center col-xs-12 col-md-3'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.8.1/img/champion/" + nemesis.image.full + "' alt='" + nemesis.name + "'></p></div>" + 
-            "<div class='text-center col-xs-12 col-md-3'><p>Or become polyvalent with a " + nemesis.tags[0] + " " + (nemesis.tags[1] || ".") + "</p></div>");
-        });
+            .done(function (data) {
+                var specialist = data.specialist;
+                var nemesis = data.nemesis;
+                $("#recommended").append("<div class='col-xs-12'><p>Best champions to get next :</div>" +
+                    "<div class='text-center col-xs-12 col-md-3'><p>Become a specialist with a " + data.best + " " + data.secondBest + "</p></div>" +
+                    "<div class='text-center col-xs-12 col-md-3'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.9.1/img/champion/" + specialist.image.full + "' alt='" + specialist.name + "'></p></div>" +
+                    "<div class='text-center col-xs-12 col-md-3'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.9.1/img/champion/" + nemesis.image.full + "' alt='" + nemesis.name + "'></p></div>" +
+                    "<div class='text-center col-xs-12 col-md-3'><p>Or become polyvalent with a " + nemesis.tags[0] + " " + (nemesis.tags[1] || ".") + "</p></div>");
+            });
     }
 
     $("#response-zone").text("");
@@ -240,6 +255,9 @@ $(document).ready(function () {
         var submission = $(this).serializeArray();
         playerName = submission[0].value;
         region = submission[1].value;
+
+        playerName = playerName.trim().replace(/\s/g, "").toLowerCase();
+
         $("body").load(window.location.href + region + "/sname/" + playerName);
     });
 
@@ -297,22 +315,22 @@ $(document).ready(function () {
             $.getJSON(window.location.href + region + "/pid/" + playerId + "/game-team")
                 .done(function (players, textStatus, jqXHR) {
 
-                    if(jqXHR.status == 200){
-                    byGameTeam = players;
-                    console.log(players);
+                    if (jqXHR.status == 200) {
+                        byGameTeam = players;
+                        console.log(players);
 
-                    $("#response-zone").append("<div class='row blue-side'></div>");
-                    $("#response-zone").append("<div class='row red-side'></div>");
+                        $("#response-zone").append("<div class='row blue-side'></div>");
+                        $("#response-zone").append("<div class='row red-side'></div>");
 
-                    var player;
-                    for (var player in players) {
-                        renderByGameTeam(players, player);
-                    }
+                        var player;
+                        for (var player in players) {
+                            renderByGameTeam(players, player);
+                        }
                     } else {
-                        console.error(jqHXR.status, textStatus);
+                        console.error(jqXHR.status, textStatus);
                     }
                 })
-                .fail(function(error){
+                .fail(function (error) {
                     console.error(error.status, error.responseText, error);
                     $("#response-zone").text("The player is probably not in game or the game's info are not available yet. If you are sure about it, try again in a minute. See console for details.");
                 });
