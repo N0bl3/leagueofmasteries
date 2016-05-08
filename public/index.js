@@ -1,6 +1,5 @@
 /*jshint browser:true, jquery:true*/
 
-//si il y a un # dans l'url on ne peut pas rechercher un nouveau joueur
 $(document).ready(function () {
     var playerId = options.playerId || "",
         playerName = options.playerName || "",
@@ -14,6 +13,10 @@ $(document).ready(function () {
 
     function renderProgression(arr) {
         $("#response-zone").text("");
+        	$("#response-zone").append("<div class='col-xs-12'>" +
+        	"<button id='by-score' type='button'>By Score</button>" +
+        	"<button id='by-grade' type='button'>By Grade</button>" +
+        	"</div>");
         arr.forEach(function (champion) {
             $("#response-zone").append("<div class='col-xs-3'><p>" +
                 "<img src='http://ddragon.leagueoflegends.com/cdn/6.9.1/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
@@ -23,10 +26,32 @@ $(document).ready(function () {
                 "</span><br>Score : " + champion.championPoints +
                 "</p></div>");
         });
+        $("#by-grade").click(function(e){
+                e.preventDefault();
+                var gradeArr = [], sortingArr =[];
+                progression.forEach(function(champion){
+                sortingArr.push([champion,champion.intGrade]);
+                });
+                sortingArr.sort(function(a,b){
+                    return b[1] - a[1];
+                });
+                for(var i = 0; i< sortingArr.length; i++){
+                	gradeArr.push(sortingArr[i][0]);
+                }
+                renderProgression(gradeArr);
+            });
+            $("#by-score").click(function(e){
+                e.preventDefault();
+                renderProgression(progression);
+            });
     }
 
     function renderTop(arr) {
         $("#response-zone").text("");
+            $("#response-zone").append("<div class='col-xs-12'>" +
+        	"<button id='by-score' type='button'>By Score</button>" +
+        	"<button id='by-grade' type='button'>By Grade</button>" +
+        	"</div>");
         $("#response-zone").append("<div class='row text-center top-first'></div>");
         $("#response-zone").append("<div class='row text-center top-second'></div>");
         $("#response-zone").append("<div class='row text-center top-third'></div>");
@@ -48,6 +73,24 @@ $(document).ready(function () {
                 $(".top-third").append(str);
             }
         });
+                $("#by-grade").click(function(e){
+                e.preventDefault();
+                var gradeArr = [], sortingArr =[];
+                top.forEach(function(champion){
+                sortingArr.push([champion,champion.intGrade]);
+                });
+                sortingArr.sort(function(a,b){
+                    return b[1] - a[1];
+                });
+                for(var i = 0; i< sortingArr.length; i++){
+                	gradeArr.push(sortingArr[i][0]);
+                }
+                renderTop(gradeArr);
+            });
+            $("#by-score").click(function(e){
+                e.preventDefault();
+                renderTop(top);
+            });
     }
 
     function renderByChampion(championId, data, textStatus, jqXHR) {
@@ -213,7 +256,42 @@ $(document).ready(function () {
                     "<div class='text-center col-xs-12 col-md-3'><p>Or become polyvalent with a " + nemesis.tags[0] + " " + (nemesis.tags[1] || ".") + "</p></div>");
             });
     }
-
+    function gradeToInt(grade){
+    	          switch (grade){
+                		case 'D-' :
+                		return  1;
+                		case 'D' :
+                		return  2;
+                		case 'D+' :
+                		return  3;
+                		case 'C-' :
+                		return  4;
+                		case 'C' :
+                		return  5;
+                		case 'C+' :
+                		return  6;
+                		case 'B-' :
+                		return  7;
+                		case 'B' :
+                		return  8;
+                		case 'B+' :
+                		return  9;
+                		case 'A-' :
+                		return  10;
+                		case 'A' :
+                		return  11;
+                		case 'A+' :
+                		return  12;
+                		case 'S-' :
+                		return  13;
+                		case 'S' :
+                		return  14;
+                		case 'S+' :
+                		return  15;
+                		default :
+                		return  0;
+                	}
+    }
     $("#response-zone").text("");
     $("#response-zone").append("<h3>ID: " + playerId + " - " + playerName + "</h3>");
     $.getJSON(window.location.href + region + "/pid/" + playerId)
@@ -245,7 +323,10 @@ $(document).ready(function () {
     $.getJSON(window.location.href + region + "/pid/" + playerId + "/champions")
         .done(function (arr) {
             progression = arr;
-            renderProgression(arr);
+            progression.forEach(function(champion){
+				champion.intGrade = gradeToInt(champion.highestGrade);
+            });
+            renderProgression(progression);
         });
 
     renderRecommendedChampion(region, playerId);
@@ -280,7 +361,7 @@ $(document).ready(function () {
             $.getJSON(window.location.href + region + "/pid/" + playerId + "/top?count=12")
                 .done(function (arr) {
                     top = arr;
-                    renderTop(arr);
+                    renderTop(top);
                 });
         } else {
             renderTop(top);

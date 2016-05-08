@@ -86,7 +86,10 @@ function getChampionsListFromAPI() {
 			console.log("Champions retrieved. First champion: ", champions.Aatrox);
 			return champions;
 		}
-		throw new Error("Error retrieving champions\nStatus Code : " + response.statusCode);
+		if(error){
+			console.log("Error retrieving champions\nStatus Code : " + response.statusCode);
+		}
+
 	});
 }
 function getChampionsList() {
