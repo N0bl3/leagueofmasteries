@@ -90,40 +90,39 @@ function getChampionsListFromAPI() {
 	});
 }
 function getChampionsList() {
-	try{
 	fs.readFile("data/champions.json", (err, data) => {
 		if (err) {
 			console.error(err);
-			throw err;
-		}
-		return data;
-		
-	});
-	}catch(err){
 		if (err instanceof Error) {
 			console.log(err);
 			return;
 		}
 		throw new Error("Can't get champions list");
-	}
+		}
+		return data;
+		
+	});
+
 }
 function writeChampionsList(champions) {
 	if(champions){
-	try{
 	fs.writeFile("data/champions.json", champions, (err) => {
 		if (err) {
-			throw err;
-		}
-			console.log("Updated champions list.");
+			if (err instanceof Error) {
+			if (err.code === "ENOENT") {
+			console.log(err.message);
 			return;
-	});
-	}catch(err){
-		if (err instanceof Error) {
+			}
 			console.log(err);
 			return;
 		}
 		throw new Error("Can't write champions list");
-	}
+		}
+		
+		console.log("Updated champions list.");
+		return true;
+	});
+
 	} else {
 		console.log("Nothing to write");
 		return false;
@@ -131,29 +130,51 @@ function writeChampionsList(champions) {
 }
 
 function initializeWorkspace() {
-	try {
 		fs.mkdir("data", (err) => {
 			if (err) {
-				throw err;
-			}
-		});
-	} catch (err) {
-		if (err instanceof Error) {
-			if (err.code != "EEXIST") {
-			console.log("Error", err);
+			if (err instanceof Error) {
+			if (err.code === "EEXIST") {
+			console.log(err.message);
+			getChampionsListFromAPI();
 			return;
 			}
-			console.log("data dir already exists");
+			console.log("Error", err);
+			return;
 		}
 		throw new Error("Can't initialize :" + err);
-	}
-	writeChampionsList(champions);
+			}
+			getChampionsListFromAPI();
+		});
 	console.log("Initialized");
+}
+function writeSummonerInfo(info){
+			fs.writeFile("/data/summoner/" + info.summonerId, info,(err) => {
+				if(err){
+		if (err instanceof Error) {
+			console.log(err);
+			return;
+		}
+		throw new Error("Can't write summoner info");
+				}
+				return;
+			});
+
+}
+function getSummonerInfo(summonerId){
+		fs.readFile("data/summoner/" + summonerId, (err, data) => {
+			if(err){
+		if (err instanceof Error) {
+			console.log(err);
+			return;
+		}
+		throw new Error("Can't get summoner info");
+			}
+			return data;
+		});
 }
 
 initializeWorkspace();
-getChampionsListFromAPI();
-var championFetch = setInterval(getChampionsListFromAPI, 86400);
+var championFetch = setInterval(getChampionsListFromAPI, 86400000);
 
 app.get("/", function (req, res) {
 	res.render('pre.pug', {}, function (err, html) {
@@ -168,7 +189,6 @@ app.get("/", function (req, res) {
 
 //Get summoner info from his name and location
 app.get("/:region/sname/:summonerName", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && isLettersAndNumbers(req.params.summonerName)) {
 		let region = req.params.region;
 		let summonerName = req.params.summonerName;
@@ -178,8 +198,8 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 			json: true
 		}, function (error, response) {
 			if (!error && response.statusCode == 200 && req.query.friend !== "true") {
-				console.log("Body:", response.body);
 				let body = response.body[summonerName];
+				console.log(champions);
 				res.render("index.pug", {
 					region: region,
 					playerName: summonerName,
@@ -196,7 +216,6 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 					}
 				});
 			} else if (!error && response.statusCode == 200 && req.query.friend === "true") {
-				console.log("Friend: " + response.body);
 				res.send(response.body);
 			} else {
 				console.error("Error at endpoint : /:region/:summonerName\nStatus Code : " + response.statusCode);
@@ -209,7 +228,6 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 //Get a champion mastery by player id and champion id. Response code 204 means there were no masteries found for given player id or player id and champion id combination. (RPC)
 //Curently misses highestGrade
 app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId) && !isNaN(req.params.championId)) {
 		let region = req.params.region;
 		let platformId = regionToPlatformId(region);
@@ -261,7 +279,6 @@ app.get("/:region/pid/:playerId/cid/:championId", function (req, res) {
 
 //Get all champion mastery entries sorted by number of champion points descending (RPC)
 app.get("/:region/pid/:playerId/champions", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
 		let region = req.params.region;
 		let platformId = regionToPlatformId(req.params.region);
@@ -288,12 +305,10 @@ app.get("/:region/pid/:playerId/champions", function (req, res) {
 
 //Get a player's total champion mastery score, which is sum of individual champion mastery levels (RPC)
 app.get("/:region/pid/:playerId", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
 		let region = req.params.region;
 		let platformId = regionToPlatformId(region);
 		let playerId = req.params.playerId;
-		console.log(region, platformId, playerId);
 		limiter.request({
 			url: "https://" + region + ".api.pvp.net/championmastery/location/" + platformId + "/player/" + playerId + "/score" + "?" + api,
 			method: "GET"
@@ -315,7 +330,6 @@ app.get("/:region/pid/:playerId", function (req, res) {
 //Get specified number of top champion mastery entries sorted by number of champion points descending (RPC)
 app.get("/:region/pid/:playerId/top", function (req, res) {
 	let count = req.query.count || 5;
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
 		let region = req.params.region;
 		let platformId = regionToPlatformId(req.params.region);
@@ -342,7 +356,6 @@ app.get("/:region/pid/:playerId/top", function (req, res) {
 
 //Get current game players
 app.get("/:region/pid/:playerId/game-team", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
 		let region = req.params.region;
 		let platformId = regionToPlatformId(region);
@@ -353,10 +366,8 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 			json: true
 		}, function (error, response) {
 			if (!error && response.statusCode == 200) {
-				console.log(response.body);
 				res.send(response.body.participants);
 			} else {
-				console.error(response);
 				console.error("Error at endpoint : /:region/pid/:playerId/game-team\nStatus Code : " + response.statusCode);
 				res.sendStatus(response.statusCode);
 			}
@@ -368,7 +379,6 @@ app.get("/:region/pid/:playerId/game-team", function (req, res) {
 
 //Get data on a specific champion
 app.get("/:region/champion/:championId", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.championId)) {
 		let championId = req.params.championId;
 		res.send(champIdToChampObject(championId));
@@ -380,7 +390,6 @@ app.get("/:region/champion/:championId", function (req, res) {
 //Get best ranked player for a given champion
 //Recommend champion based on style
 app.get("/:region/pid/:playerId/recommended", function (req, res) {
-	console.log(req.params);
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
 		let region = req.params.region;
 		let platformId = regionToPlatformId(region);
@@ -399,14 +408,12 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 				});
 				possessedChampions.forEach(function (championId) {
 					let championTags;
-
 					for (let champion in champions) {
 						if (championId == champions[champion].id) {
 							championTags = champions[champion].tags;
 
 							scoreByRole[championTags[0]] = scoreByRole[championTags[0]] ? scoreByRole[championTags[0]] + 2 : 2;
 
-							console.log(championId, scoreByRole);
 							if (championTags[1]) {
 								scoreByRole[championTags[1]] = scoreByRole[championTags[1]] ? scoreByRole[championTags[1]] + 1 : 1;
 							}
@@ -432,7 +439,6 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 						}
 					}
 				}
-
 
 				let specialistsChampions = [];
 				let lessSpecialistsChampions = [];
