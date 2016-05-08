@@ -34,4 +34,9 @@ Depending on how far development went :
 
 # Thanks to all above software contributors
 
+### Why did i enter the contest?
+As a self taught JS developer, I wanted to prove to myself that i could design a fully functional web-app & that's when i landed on LoL home-page telling about RIOT API Developers Challenge April 2016!
+What a great topic to work on! My favourite game craves for new talents! As soon as i read the contest rules i jumped in. I didn't have a clear idea of what to do at first, but the idea was to make the most out of what was provided.
+
+### Disclaimer
 LeagueOfMasteries isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
