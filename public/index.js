@@ -20,7 +20,7 @@ $(document).ready(function () {
             "<button id='by-grade' type='button'>By Grade</button>" +
             "</div>");
         arr.forEach(function (champion) {
-            $("#response-zone").append("<div class='col-xs-2'><p>" +
+            $("#response-zone").append("<div class='col-xs-3'><p>" +
                 "<img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
                 champion.name +
                 "</span><br>Grade : Level<br><span id='champion-grade'>" +
@@ -122,7 +122,7 @@ $(document).ready(function () {
         if (champion) {
             champion = champions[championId];
 
-            $("#response-zone").append("<div class='row'><div class='col-xs-2 me'></div><div class='col-xs-4 friend-compare'>" +
+            $("#response-zone").append("<div class='row'><div class='col-xs-3 me'></div><div class='col-xs-3 friend-compare'>" +
                 "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + data.championName + "' class='top-img'><br><span id='champion-name'>" +
                 data.championName +
                 "</span>, " + champion.title +
@@ -436,8 +436,8 @@ $(document).ready(function () {
             }
         });
         var quizzChampion = masteredChampions[Math.floor(Math.random() * masteredChampions.length)].id;
-
-        $("#response-zone").load("https://leagueofmasteries.eu-gb.mybluemix.net/render/quizz/cid/" + quizzChampion + "/S");
+        $("#response-zone").text("Under Development<br>quizzChampion");
+        //        $("#response-zone").load("https://leagueofmasteries.eu-gb.mybluemix.net/render/quizz/cid/" + quizzChampion + "/S");
     });
 
     $("#leaderboards-button").click(function (event) {
