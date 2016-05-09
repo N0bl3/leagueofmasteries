@@ -24,13 +24,13 @@ Depending on how far development went :
 - Leaderboards should show you who masters a given champion the most / Comparison with friends to come
 
 ### You want to install on your server?
-Git clone this repo
+Git clone this repo (master branch)
 
 Npm install
 
 Node start in production mode.
 
-Requires a Cloudant DB and to provide a RIOT API key in process.env
+Requires a RIOT API key in process.env
 
 ### Software used
 - [NodeJS 6](https://nodejs.org/en/)
