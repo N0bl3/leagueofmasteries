@@ -23,6 +23,15 @@ Depending on how far development went :
 - Quizz will be a quizz concerning your best champions
 - Leaderboards should show you who masters a given champion the most / Comparison with friends to come
 
+### You want to install on your server?
+Git clone this repo
+
+Npm install
+
+Node start in production mode.
+
+Requires a Cloudant DB and to provide a RIOT API key in process.env
+
 ### Software used
 - [NodeJS 6](https://nodejs.org/en/)
 - [Bootstrap 3](http://getbootstrap.com/)
