@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-let champions;
+let champions, version, keys;
 
 function regionToPlatformId(region) {
 	switch (region) {
@@ -74,110 +74,24 @@ function isLettersAndNumbers(str) {
 	return /^[a-zA-Z0-9]+$/.test(str);
 }
 
-function getChampionsListFromAPI() {
+function getChampionsList() {
 	limiter.request({
-		url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=image,tags&" + api,
+		url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=all&" + api,
 		method: "GET",
 		json: true
 	}, function (error, response) {
 		if (!error && response.statusCode == 200) {
 			champions = response.body.data;
-			writeChampionsList(champions);
-			console.log("Champions retrieved. First champion: ", champions.Aatrox);
-			return champions;
+			version = response.body.version;
+			keys = response.body.keys;
+			console.log("Champions retrieved. First champion: ", champions[keys["1"]].name, champions[keys["1"]].title);
 		}
-		if(error){
+		if (error) {
 			console.log("Error retrieving champions\nStatus Code : " + response.statusCode);
 		}
 
 	});
 }
-function getChampionsList() {
-	fs.readFile("data/champions.json", (err, data) => {
-		if (err) {
-			console.error(err);
-		if (err instanceof Error) {
-			console.log(err);
-			return;
-		}
-		throw new Error("Can't get champions list");
-		}
-		return data;
-		
-	});
-
-}
-function writeChampionsList(champions) {
-	if(champions){
-	fs.writeFile("data/champions.json", champions, (err) => {
-		if (err) {
-			if (err instanceof Error) {
-			if (err.code === "ENOENT") {
-			console.log(err.message);
-			return;
-			}
-			console.log(err);
-			return;
-		}
-		throw new Error("Can't write champions list");
-		}
-		
-		console.log("Updated champions list.");
-		return true;
-	});
-
-	} else {
-		console.log("Nothing to write");
-		return false;
-	}
-}
-
-function initializeWorkspace() {
-		fs.mkdir("data", (err) => {
-			if (err) {
-			if (err instanceof Error) {
-			if (err.code === "EEXIST") {
-			console.log(err.message);
-			getChampionsListFromAPI();
-			return;
-			}
-			console.log("Error", err);
-			return;
-		}
-		throw new Error("Can't initialize :" + err);
-			}
-			getChampionsListFromAPI();
-		});
-	console.log("Initialized");
-}
-function writeSummonerInfo(info){
-			fs.writeFile("/data/summoner/" + info.summonerId, info,(err) => {
-				if(err){
-		if (err instanceof Error) {
-			console.log(err);
-			return;
-		}
-		throw new Error("Can't write summoner info");
-				}
-				return;
-			});
-
-}
-function getSummonerInfo(summonerId){
-		fs.readFile("data/summoner/" + summonerId, (err, data) => {
-			if(err){
-		if (err instanceof Error) {
-			console.log(err);
-			return;
-		}
-		throw new Error("Can't get summoner info");
-			}
-			return data;
-		});
-}
-
-initializeWorkspace();
-var championFetch = setInterval(getChampionsListFromAPI, 86400000);
 
 app.get("/", function (req, res) {
 	res.render('pre.pug', {}, function (err, html) {
@@ -209,7 +123,8 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 					summonerName: body.name,
 					profileIconId: body.profileIconId,
 					id: body.id,
-					champions: champions
+					champions: champions,
+					version: version
 				}, function (err, html) {
 					if (!err) {
 						res.send(html);
@@ -390,7 +305,6 @@ app.get("/:region/champion/:championId", function (req, res) {
 	}
 });
 
-//Get best ranked player for a given champion
 //Recommend champion based on style
 app.get("/:region/pid/:playerId/recommended", function (req, res) {
 	if (isRegion(req.params.region) && !isNaN(req.params.playerId)) {
@@ -485,6 +399,35 @@ app.get("/:region/pid/:playerId/recommended", function (req, res) {
 		res.sendStatus(400);
 	}
 });
+
+app.get("/render/quizz/cid/:championId/:grade", function (req, res) {
+	if (!isNaN(req.params.championId)) {
+		let championId = req.params.championId;
+		let quizzChampion;
+		for (let champion in champions) {
+			if (championId == champions[champion].id) {
+				quizzChampion = champions[champion];
+				break;
+			}
+		}
+		res.render("quizz.pug", {
+			champion: quizzChampion,
+			grade: req.params.grade
+		}, function (err, html) {
+			if (!err) {
+				res.send(html);
+			} else {
+				console.error(err.message);
+				res.end(err.message);
+			}
+		});
+	} else {
+		res.sendStatus(400);
+	}
+});
+
+getChampionsList();
+var renewStaticData = setInterval(getChampionsList, 86400000);
 
 // Runs the server
 app.listen(appEnv.port, function () {
