@@ -111,7 +111,6 @@ $(document).ready(function () {
 
     function renderTop(arr) {
         $("#response-zone").text("");
-        $("#response-zone").append("<div class='row'><div class='col-xs-12'><canvas id='pie' width='400' height='400'></canvas></div></div>");
         $("#response-zone").append("<div class='row'><div class='col-xs-12'>" +
             "<button id='by-score' type='button'>By Score</button>" +
             "<button id='by-grade' type='button'>By Grade</button>" +
