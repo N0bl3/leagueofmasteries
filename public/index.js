@@ -13,21 +13,50 @@ $(document).ready(function () {
     var progression, top, byChampion, byGameTeam;
     var champions = {};
 
-    function renderProgression(arr) {
+    function renderProgression(arr, sortBy) {
+        var str;
         $("#response-zone").text("");
-        $("#response-zone").append("<div class='col-xs-12'>" +
-            "<button id='by-score' type='button'>By Score</button>" +
-            "<button id='by-grade' type='button'>By Grade</button>" +
-            "</div>");
+
+        if (sortBy === "grade") {
+            str = "<div class='col-xs-12'>" +
+                "<button id='by-score' type='button'>By Score</button>" +
+                "<button id='by-grade' type='button'>By Grade</button>" +
+                "</div>" +
+                "<div class='row text-center grade s-grade'><div class='col-xs-12'><h3>Grade S</h3></div></div><div class='row text-center grade a-grade'><div class='col-xs-12'><h3>Grade A</h3></div></div><div class='row text-center grade b-grade'><div class='col-xs-12'><h3>Grade B</h3></div></div><div class='row text-center grade c-grade'><div class='col-xs-12'><h3>Grade C</h3></div></div><div class='row grade d-grade'><div class='col-xs-12'><h3>Grade D</h3></div></div><div class='row text-center grade no-grade'><div class='col-xs-12'><h3>No Grade</h3></div></div>";
+        } else if (sortBy === "score") {
+            str = "<div class='col-xs-12'>" +
+                "<button id='by-score' type='button'>By Score</button>" +
+                "<button id='by-grade' type='button'>By Grade</button>" +
+                "</div>" +
+                "<div class='row text-center level level-5'><div class='col-xs-12'><h3>Level 5</h3></div></div><div class='row text-center level level-4'><div class='col-xs-12'><h3>Level 4</h3></div></div><div class='row text-center level level-3'><div class='col-xs-12'><h3>Level 3</h3></div></div><div class='row text-center level level-2'><div class='col-xs-12'><h3>Level 2</h3></div></div><div class='row level level-1'><div class='col-xs-12'><h3>Level 1</h3></div></div>";
+        }
+        $("#response-zone").append(str);
+
         arr.forEach(function (champion) {
-            $("#response-zone").append("<div class='col-xs-3'><p>" +
-                "<img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
-                champion.name +
-                "</span><br>Grade : Level<br><span id='champion-grade'>" +
-                (champion.highestGrade || "None") + " : " + (champion.championLevel || 0) +
-                "</span><br>Score : " + champion.championPoints +
-                "</p></div>");
+
+            champion.intGrade = gradeToInt(champion.highestGrade);
+            champion.smallGrade = champion.highestGrade ? champion.highestGrade.replace(/\W/g, "").toLowerCase() : 'no';
+            console.log(champion.championLevel);
+            if (sortBy === "grade") {
+                $("." + champion.smallGrade + "-grade").append("<div class='col-xs-3'><p>" +
+                    "<img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
+                    champion.name +
+                    "</span><br>Grade : Level<br><span id='champion-grade'>" +
+                    (champion.highestGrade || "None") + " : " + (champion.championLevel || 0) +
+                    "</span><br>Score : " + champion.championPoints +
+                    "</p></div>");
+            } else if (sortBy === "score") {
+                $(".level-" + champion.championLevel).append("<div class='col-xs-3'><p>" +
+                    "<img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
+                    champion.name +
+                    "</span><br>Grade : Level<br><span id='champion-grade'>" +
+                    (champion.highestGrade || "None") + " : " + (champion.championLevel || 0) +
+                    "</span><br>Score : " + champion.championPoints +
+                    "</p></div>");
+            }
+
         });
+
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
@@ -41,11 +70,11 @@ $(document).ready(function () {
             for (var i = 0; i < sortingArr.length; i++) {
                 gradeArr.push(sortingArr[i][0]);
             }
-            renderProgression(gradeArr);
+            renderProgression(gradeArr, "grade");
         });
         $("#by-score").click(function (e) {
             e.preventDefault();
-            renderProgression(progression);
+            renderProgression(progression, "score");
         });
     }
 
@@ -339,7 +368,7 @@ $(document).ready(function () {
             progression.forEach(function (champion) {
                 champion.intGrade = gradeToInt(champion.highestGrade);
             });
-            renderProgression(progression);
+            renderProgression(progression, "score");
         });
 
     renderRecommendedChampion(region, playerId);
@@ -361,10 +390,10 @@ $(document).ready(function () {
             $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + playerId + "/champions")
                 .done(function (arr) {
                     progression = arr;
-                    renderProgression(arr);
+                    renderProgression(arr, "score");
                 });
         } else {
-            renderProgression(progression);
+            renderProgression(progression, "score");
         }
     });
 
