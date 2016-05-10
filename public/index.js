@@ -84,6 +84,10 @@ $(document).ready(function () {
         gradesMean = Math.round(gradesMean / (arr.length));
         $(".resume").append("<div class='col-xs-2'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-2'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-2'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-2'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-2'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-2'><h4>D grade : " + dGrades + "</h4></div>");
 
+
+        //        Future chart
+        //        var pie = new Chart();
+
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
@@ -162,6 +166,7 @@ $(document).ready(function () {
         });
         gradesMean = Math.round(gradesMean / (arr.length));
         $(".resume").append("<div class='col-xs-2'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-2'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-2'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-2'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-2'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-2'><h4>D grade : " + dGrades + "</h4></div>");
+
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
