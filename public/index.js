@@ -21,13 +21,13 @@ $(document).ready(function () {
             str = "<div class='col-xs-12'>" +
                 "<button id='by-score' type='button'>By Score</button>" +
                 "<button id='by-grade' type='button'>By Grade</button>" +
-                "</div><div class='row text-center resume'></div>" +
+                "</div><div class='col-xs-4'><canvas id='pie' width='100' height='100'></canvas></div><div class='col-xs-8 resume'></div>" +
                 "<div class='row text-center grade s-grade'><div class='col-xs-12'><h3>Grade S</h3></div></div><div class='row text-center grade a-grade'><div class='col-xs-12'><h3>Grade A</h3></div></div><div class='row text-center grade b-grade'><div class='col-xs-12'><h3>Grade B</h3></div></div><div class='row text-center grade c-grade'><div class='col-xs-12'><h3>Grade C</h3></div></div><div class='row grade d-grade'><div class='col-xs-12'><h3>Grade D</h3></div></div><div class='row text-center grade no-grade'><div class='col-xs-12'><h3>No Grade</h3></div></div>";
         } else if (sortBy === "score") {
             str = "<div class='col-xs-12'>" +
                 "<button id='by-score' type='button'>By Score</button>" +
                 "<button id='by-grade' type='button'>By Grade</button>" +
-                "</div><div class='row text-center resume'></div>" +
+                "</div><div class='col-xs-4'><canvas id='pie' width='100' height='100'></canvas></div><div class='col-xs-8 resume'></div>" +
                 "<div class='row text-center level level-5'><div class='col-xs-12'><h3>Level 5</h3></div></div><div class='row text-center level level-4'><div class='col-xs-12'><h3>Level 4</h3></div></div><div class='row text-center level level-3'><div class='col-xs-12'><h3>Level 3</h3></div></div><div class='row text-center level level-2'><div class='col-xs-12'><h3>Level 2</h3></div></div><div class='row level level-1'><div class='col-xs-12'><h3>Level 1</h3></div></div>";
         }
         $("#response-zone").append(str);
@@ -36,7 +36,13 @@ $(document).ready(function () {
             aGrades = 0,
             bGrades = 0,
             cGrades = 0,
-            dGrades = 0;
+            dGrades = 0,
+            levelMean = 0,
+            levelOne = 0,
+            levelTwo = 0,
+            levelThree = 0,
+            levelFour = 0,
+            levelFive = 0;
         arr.forEach(function (champion) {
 
             champion.intGrade = !champion.intGrade ? gradeToInt(champion.highestGrade) : champion.intGrade;
@@ -61,6 +67,26 @@ $(document).ready(function () {
                         break;
                 }
             }
+            if (champion.championLevel){
+            	levelMean += Number(champion.championLevel);
+            	switch (champion.championLevel) {
+            		case 1:
+            		levelOne++;
+            		break;
+            		case 2:
+            		levelTwo++;
+            		break;
+            		case 3:
+            		levelThree++;
+            		break;
+            		case 4:
+            		levelFour++;
+            		break;
+            		case 5:
+            		levelFive++;
+            		break;
+            	}
+            }
             if (sortBy === "grade") {
                 $("." + champion.smallGrade + "-grade").append("<div class='col-xs-3'><p>" +
                     "<img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
@@ -82,11 +108,50 @@ $(document).ready(function () {
         });
 
         gradesMean = Math.round(gradesMean / (arr.length));
-        $(".resume").append("<div class='col-xs-2'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-2'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-2'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-2'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-2'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-2'><h4>D grade : " + dGrades + "</h4></div>");
-
-
-        //        Future chart
-        //        var pie = new Chart();
+        levelMean  = Math.round(levelMean / (arr.length));
+        Chart.defaults.global.legend.display = true;
+        Chart.defaults.global.legend.labels.boxWidth = 10;
+		if (sortBy === "grade"){
+        $(".resume").append("<div class='col-xs-12'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-12'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-12'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-12'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-12'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-12'><h4>D grade : " + dGrades + "</h4></div>");
+        var pie = new Chart($("#pie"), {
+    		type: 'pie',
+    		data: {
+    			labels: [
+    				"S",
+    				"A",
+    				"B",
+    				"C",
+    				"D"
+    			],
+    			datasets: [
+    				{
+    					data: [sGrades, aGrades, bGrades, cGrades, dGrades],
+    					backgroundColor: ["#21DD60", "#8CDD21", "#D8BD20", "#DB8720", "#E02121"]
+    				}
+    			]
+    		}
+		});
+		} else if (sortBy === "score"){
+        $(".resume").append("<div class='col-xs-12'><h4>Mean level : " + levelMean + "</h4></div><div class='col-xs-12'><h4>Level 5 : " + levelFive + "</h4></div><div class='col-xs-12'><h4>Level 4 : " + levelFour + "</h4></div><div class='col-xs-12'><h4>Level 3 : " + levelThree + "</h4></div><div class='col-xs-12'><h4>Level 2 : " + levelTwo + "</h4></div><div class='col-xs-12'><h4>Level 1 : " + levelOne + "</h4></div>");
+        var pie = new Chart($("#pie"), {
+    		type: 'pie',
+    		data: {
+    			labels: [
+    				"5",
+    				"4",
+    				"3",
+    				"2",
+    				"1"
+    			],
+    			datasets: [
+    				{
+    					data: [levelFive, levelFour, levelThree, levelTwo, levelOne],
+    					backgroundColor: ["#21DD60", "#8CDD21", "#D8BD20", "#DB8720", "#E02121"]
+    				}
+    			]
+    		}
+		});
+		}
 
         $("#by-grade").click(function (e) {
             e.preventDefault();
