@@ -239,15 +239,15 @@ $(document).ready(function () {
             top.forEach(function (champion) {
                 sortingArr.push([champion, gradeToInt(champion.highestGrade)]);
             });
-            console.log(sortingArr);
+
             sortingArr.sort(function (a, b) {
                 return b[1] - a[1];
             });
-            console.log(sortingArr);
+
             for (var i = 0; i < sortingArr.length; i++) {
                 gradeArr.push(sortingArr[i][0]);
             }
-            console.log(gradeArr);
+
             renderTop(gradeArr);
         });
         $("#by-score").click(function (e) {

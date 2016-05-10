@@ -116,7 +116,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
 		}, function (error, response) {
 			if (!error && response.statusCode == 200 && req.query.friend !== "true") {
 				let body = response.body[summonerName];
-				console.log(champions);
+
 				res.render("index.pug", {
 					region: region,
 					playerName: summonerName,
