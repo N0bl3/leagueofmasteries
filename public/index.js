@@ -21,22 +21,46 @@ $(document).ready(function () {
             str = "<div class='col-xs-12'>" +
                 "<button id='by-score' type='button'>By Score</button>" +
                 "<button id='by-grade' type='button'>By Grade</button>" +
-                "</div>" +
+                "</div><div class='row text-center resume'></div>" +
                 "<div class='row text-center grade s-grade'><div class='col-xs-12'><h3>Grade S</h3></div></div><div class='row text-center grade a-grade'><div class='col-xs-12'><h3>Grade A</h3></div></div><div class='row text-center grade b-grade'><div class='col-xs-12'><h3>Grade B</h3></div></div><div class='row text-center grade c-grade'><div class='col-xs-12'><h3>Grade C</h3></div></div><div class='row grade d-grade'><div class='col-xs-12'><h3>Grade D</h3></div></div><div class='row text-center grade no-grade'><div class='col-xs-12'><h3>No Grade</h3></div></div>";
         } else if (sortBy === "score") {
             str = "<div class='col-xs-12'>" +
                 "<button id='by-score' type='button'>By Score</button>" +
                 "<button id='by-grade' type='button'>By Grade</button>" +
-                "</div>" +
+                "</div><div class='row text-center resume'></div>" +
                 "<div class='row text-center level level-5'><div class='col-xs-12'><h3>Level 5</h3></div></div><div class='row text-center level level-4'><div class='col-xs-12'><h3>Level 4</h3></div></div><div class='row text-center level level-3'><div class='col-xs-12'><h3>Level 3</h3></div></div><div class='row text-center level level-2'><div class='col-xs-12'><h3>Level 2</h3></div></div><div class='row level level-1'><div class='col-xs-12'><h3>Level 1</h3></div></div>";
         }
         $("#response-zone").append(str);
-
+        var gradesMean = 0,
+            sGrades = 0,
+            aGrades = 0,
+            bGrades = 0,
+            cGrades = 0,
+            dGrades = 0;
         arr.forEach(function (champion) {
 
-            champion.intGrade = gradeToInt(champion.highestGrade);
+            champion.intGrade = !champion.intGrade ? gradeToInt(champion.highestGrade) : champion.intGrade;
             champion.smallGrade = champion.highestGrade ? champion.highestGrade.replace(/\W/g, "").toLowerCase() : 'no';
-            console.log(champion.championLevel);
+            if (champion.highestGrade) {
+                gradesMean += gradeToInt(champion.highestGrade);
+                switch (champion.highestGrade.replace(/\W/g, "")) {
+                    case "S":
+                        sGrades++;
+                        break;
+                    case "A":
+                        aGrades++;
+                        break;
+                    case "B":
+                        bGrades++;
+                        break;
+                    case "C":
+                        cGrades++;
+                        break;
+                    case "D":
+                        dGrades++;
+                        break;
+                }
+            }
             if (sortBy === "grade") {
                 $("." + champion.smallGrade + "-grade").append("<div class='col-xs-3'><p>" +
                     "<img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'><br><span id='champion-name'>" +
@@ -57,12 +81,15 @@ $(document).ready(function () {
 
         });
 
+        gradesMean = Math.round(gradesMean / (arr.length));
+        $(".resume").append("<div class='col-xs-2'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-2'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-2'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-2'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-2'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-2'><h4>D grade : " + dGrades + "</h4></div>");
+
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
                 sortingArr = [];
             progression.forEach(function (champion) {
-                sortingArr.push([champion, champion.intGrade]);
+                sortingArr.push([champion, gradeToInt(champion.highestGrade)]);
             });
             sortingArr.sort(function (a, b) {
                 return b[1] - a[1];
@@ -80,15 +107,42 @@ $(document).ready(function () {
 
     function renderTop(arr) {
         $("#response-zone").text("");
-        $("#response-zone").append("<div class='col-xs-12'>" +
+        $("#response-zone").append("<div class='row'><div class='col-xs-12'>" +
             "<button id='by-score' type='button'>By Score</button>" +
             "<button id='by-grade' type='button'>By Grade</button>" +
-            "</div>");
+            "</div></div>");
+        $("#response-zone").append("<div class='row text-center resume'></div>");
         $("#response-zone").append("<div class='row text-center top-first'></div>");
         $("#response-zone").append("<div class='row text-center top-second'></div>");
         $("#response-zone").append("<div class='row text-center top-third'></div>");
 
+        var gradesMean = 0,
+            sGrades = 0,
+            aGrades = 0,
+            bGrades = 0,
+            cGrades = 0,
+            dGrades = 0;
         arr.forEach(function (champion, index) {
+            if (champion.highestGrade) {
+                gradesMean += gradeToInt(champion.highestGrade);
+                switch (champion.highestGrade.replace(/\W/g, "")) {
+                    case "S":
+                        sGrades++;
+                        break;
+                    case "A":
+                        aGrades++;
+                        break;
+                    case "B":
+                        bGrades++;
+                        break;
+                    case "C":
+                        cGrades++;
+                        break;
+                    case "D":
+                        dGrades++;
+                        break;
+                }
+            }
             var str = "<div class='col-xs-3'><p>" +
                 "<span class='hidden-xs hidden-sm'><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + champion.name + "' class='top-img'></span>" +
                 "<span class='hidden-md hidden-lg'><img src='http://ddragon.leagueoflegends.com/cdn/" + gameVersion + "/img/champion/" + champion.image.full + "' alt='" + champion.name + "'></span><br><span id='champion-name'>" +
@@ -106,19 +160,24 @@ $(document).ready(function () {
                 $(".top-third").append(str);
             }
         });
+        gradesMean = Math.round(gradesMean / (arr.length));
+        $(".resume").append("<div class='col-xs-2'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-2'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-2'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-2'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-2'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-2'><h4>D grade : " + dGrades + "</h4></div>");
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
                 sortingArr = [];
             top.forEach(function (champion) {
-                sortingArr.push([champion, champion.intGrade]);
+                sortingArr.push([champion, gradeToInt(champion.highestGrade)]);
             });
+            console.log(sortingArr);
             sortingArr.sort(function (a, b) {
                 return b[1] - a[1];
             });
+            console.log(sortingArr);
             for (var i = 0; i < sortingArr.length; i++) {
                 gradeArr.push(sortingArr[i][0]);
             }
+            console.log(gradeArr);
             renderTop(gradeArr);
         });
         $("#by-score").click(function (e) {
@@ -331,6 +390,43 @@ $(document).ready(function () {
                 return 15;
             default:
                 return 0;
+        }
+    }
+
+    function intToGrade(int) {
+        switch (int) {
+            case 1:
+                return 'D-';
+            case 2:
+                return 'D';
+            case 3:
+                return 'D+';
+            case 4:
+                return 'C-';
+            case 5:
+                return 'C';
+            case 6:
+                return 'C+';
+            case 7:
+                return 'B-';
+            case 8:
+                return 'B';
+            case 9:
+                return 'B+';
+            case 10:
+                return 'A-';
+            case 11:
+                return 'A';
+            case 12:
+                return 'A+';
+            case 13:
+                return 'S-';
+            case 14:
+                return 'S';
+            case 15:
+                return 'S+';
+            default:
+                return 'None';
         }
     }
 
