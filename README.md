@@ -23,14 +23,23 @@ Depending on how far development went :
 - Quizz will be a quizz concerning your best champions
 - Leaderboards should show you who masters a given champion the most / Comparison with friends to come
 
-### You want to install on your server?
-Git clone this repo (master branch)
+### Install on your server?
 
-Npm install
+Requires Node >= 6.1.0 & a RIOT Developer API Key
 
-Node start in production mode.
+```batchfile
+$ git clone https://github.com/N0bl3/leagueofmasteries.git
 
-Requires a RIOT API key in process.env
+$ cd leagueofmasteries
+
+$ npm install
+
+$ set NODE_ENV=production
+
+$ set RIOT_API={Your API KEY}
+
+$ npm start
+```
 
 ### Software used
 - [NodeJS 6](https://nodejs.org/en/)
