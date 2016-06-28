@@ -7,9 +7,9 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "mocha tests/",
-    "prebuild": "npm test",
+    "prebuild": "",
     "build": "",
-    "prestart": "npm test",
+    "prestart": "",
     "start": "node server.js"
   },
   "engines": {
