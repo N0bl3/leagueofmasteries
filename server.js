@@ -104,7 +104,7 @@ app.get('/', (req, res) => {
   res.render('pre.pug', {}, (err, html) => {
     if (!err) {
       res.send(html);
-    } else {
+    }else {
       res.status(500).end('Error while starting app!');
     }
   });
@@ -138,13 +138,13 @@ app.get('/:region/sname/:summonerName', (req, res) => {
         }, (err, html) => {
           if (!err) {
             res.send(html);
-          } else {
+          }else {
             res.end(err.message);
           }
         });
-      } else if (!error && response.statusCode === 200 && friend === 'true') {
+      }else if (!error && response.statusCode === 200 && friend === 'true') {
         res.send(response.body);
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
@@ -187,20 +187,20 @@ app.get('/:region/pid/:playerId/cid/:championId', (req, res) => {
               preparedResponse.highestGrade = 'None';
             }
             res.send(preparedResponse);
-          } else {
+          }else {
             res.sendStatus(response2.statusCode);
           }
         });
-      } else if (!error && response.statusCode === 204) {
+      }else if (!error && response.statusCode === 204) {
         res.status(204).end(
           `${response.statusCode}
           No masteries found for given player id or player id and champion id combination`
         );
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -221,11 +221,11 @@ app.get('/:region/pid/:playerId/champions', (req, res) => {
           Object.assign(champion, champIdToChampObject(champion.championId));
         });
         res.send(response.body);
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -243,13 +243,13 @@ app.get('/:region/pid/:playerId', (req, res) => {
     }, (error, response) => {
       if (!error && response.statusCode === 200) {
         res.send(response.body);
-      } else if (!error) {
+      }else if (!error) {
         res.status(response.statusCode).end();
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -272,11 +272,11 @@ app.get('/:region/pid/:playerId/top', (req, res) => {
           Object.assign(champion, champIdToChampObject(champion.championId));
         });
         res.send(response.body);
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -297,11 +297,11 @@ app.get('/:region/pid/:playerId/game-team', (req, res) => {
     }, (error, response) => {
       if (!error && response.statusCode === 200) {
         res.send(response.body.participants);
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -314,7 +314,7 @@ app.get('/:region/champion/:championId', (req, res) => {
   if (isRegion(req.params.region) && !isNaN(req.params.championId)) {
     const championId = req.params.championId;
     res.send(champIdToChampObject(championId));
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -374,7 +374,7 @@ app.get('/:region/pid/:playerId/recommended', (req, res) => {
               best[0][0] = role;
               best[1][1] = best[1][0];
               best[1][0] = score;
-            } else {
+            }else {
               best[0][1] = role;
               best[1][1] = score;
             }
@@ -388,10 +388,10 @@ app.get('/:region/pid/:playerId/recommended', (req, res) => {
           if (best[0][0] === champions[champion].tags[0]) {
             if (best[0][1] === champions[champion].tags[1]) {
               specialistsChampions.unshift(champions[champion]);
-            } else {
+            }else {
               lessSpecialistsChampions.push(champions[champion]);
             }
-          } else if (
+          }else if (
             best[0][0] !== champions[champion].tags[0] &&
             best[0][0] !== champions[champion].tags[1]
             && best[0][1] !== champions[champion].tags[0]
@@ -405,7 +405,7 @@ app.get('/:region/pid/:playerId/recommended', (req, res) => {
           let toReturn = '';
           if (specialistsChampions.length) {
             toReturn = chooseOne(specialistsChampions);
-          } else if (lessSpecialistsChampions.length) {
+          }else if (lessSpecialistsChampions.length) {
             toReturn = chooseOne(lessSpecialistsChampions);
           }
           return toReturn;
@@ -418,11 +418,11 @@ app.get('/:region/pid/:playerId/recommended', (req, res) => {
           specialist,
           nemesis,
         }));
-      } else {
+      }else {
         res.sendStatus(response.statusCode);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });
@@ -438,11 +438,11 @@ app.get('/render/quizz/cid/:championId/:grade', (req, res) => {
     }, (err, html) => {
       if (!err) {
         res.send(html);
-      } else {
+      }else {
         res.end(err.message);
       }
     });
-  } else {
+  }else {
     res.sendStatus(400);
   }
 });

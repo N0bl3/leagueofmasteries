@@ -4,5 +4,7 @@
     <inspection_tool class="Eslint" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="JSLastCommaInArrayLiteral" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="JSLastCommaInObjectLiteral" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSUnresolvedFunction" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSUnresolvedVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
   </profile>
 </component>

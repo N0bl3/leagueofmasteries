@@ -8,7 +8,7 @@ $(document).ready(function () {
         playerScore;
     
     var friendCounter = 0;
-    var progression, top, byChampion, byGameTeam;
+    var progression, top, byChampion;
     var champions = {};
     
     function renderProgression(arr, sortBy) {
@@ -111,9 +111,10 @@ $(document).ready(function () {
         Chart.defaults.global.legend.display = true;
         Chart.defaults.global.legend.labels.boxWidth = 10;
         var resume = $(".resume");
+        var pie; //eslint-disable-line no-unused-vars
         if (sortBy === "grade") {
             resume.append("<div class='col-xs-12'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-12'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-12'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-12'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-12'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-12'><h4>D grade : " + dGrades + "</h4></div>");
-            var pie = new Chart($("#pie"), {
+            pie = new Chart($("#pie"), {
                 type: 'pie',
                 data: {
                     labels: [
@@ -133,7 +134,7 @@ $(document).ready(function () {
             });
         } else if (sortBy === "score") {
             resume.append("<div class='col-xs-12'><h4>Mean level : " + levelMean + "</h4></div><div class='col-xs-12'><h4>Level 5 : " + levelFive + "</h4></div><div class='col-xs-12'><h4>Level 4 : " + levelFour + "</h4></div><div class='col-xs-12'><h4>Level 3 : " + levelThree + "</h4></div><div class='col-xs-12'><h4>Level 2 : " + levelTwo + "</h4></div><div class='col-xs-12'><h4>Level 1 : " + levelOne + "</h4></div>");
-            var pie = new Chart($("#pie"), {
+            pie = new Chart($("#pie"), {
                 type: 'pie',
                 data: {
                     labels: [
@@ -263,8 +264,6 @@ $(document).ready(function () {
         friendCounter = 0;
         if (jqXHR) {
             if (jqXHR.status != 200) {
-                console.log(data);
-                console.error(jqXHR.status, textStatus);
                 alert("No info for this champion and this summoner");
                 return false;
             }
@@ -346,13 +345,11 @@ $(document).ready(function () {
         $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + friendRegion + "/sname/" + friendName + "?friend=true")
             .done(function (json, textStatus, jqXHR) {
                 if (jqXHR.status != 404) {
-                    console.log(json);
                     json = json[friendName];
                     var friendId = json.id;
                     $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + friendId + "/cid/" + championId)
                         .done(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == 200) {
-                                console.log(data);
                                 var championLevel = data.championLevel;
                                 var championPoints = data.championPoints;
                                 var highestGrade = data.highestGrade;
@@ -366,14 +363,10 @@ $(document).ready(function () {
                                     (highestGrade || "None") +
                                     "</span></p></div>");
                             } else if (jqXHR.status == 204) {
-                                console.error(jqXHR.status, textStatus);
-                                console.log(jqXHR);
                                 $(".friend-list").append("<div class='col-xs-12'><p><img src='http://ddragon.leagueoflegends.com/cdn/6.9.1/img/profileicon/" + json.profileIconId + ".png' width='30' height='30'> " + json.name +
                                     "<br>No data</p></div>");
                             }
                         });
-                } else {
-                    console.error(jqXHR.status + " " + textStatus);
                 }
             });
     }
@@ -389,7 +382,6 @@ $(document).ready(function () {
                     $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + players[counter].summonerId + "/cid/" + players[counter].championId)
                         .done(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == 200 || jqXHR.status == 204) {
-                                console.log(data || "No mastery data found");
                                 var championLevel = data ? data.championLevel : "None";
                                 var championPoints = data ? data.championPoints : "None";
                                 var highestGrade = data ? data.highestGrade : "None";
@@ -408,9 +400,6 @@ $(document).ready(function () {
                                 } else if (players[counter].teamId == 200) {
                                     $(".blue-side").append(str);
                                 }
-                                console.log(jqXHR.status, textStatus);
-                            } else {
-                                console.error(jqXHR.status, textStatus);
                             }
                         });
                 });
@@ -587,8 +576,6 @@ $(document).ready(function () {
         var submission = $(this).serializeArray();
         var championId = submission[0].value;
         if (championId != 0 && (!byChampion || byChampion.championId != championId)) {
-            console.info(championId);
-            console.log(byChampion);
             $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + playerId + "/cid/" + championId)
                 .done(function (data, textStatus, jqXHR) {
                     byChampion = data;
@@ -596,7 +583,6 @@ $(document).ready(function () {
                 });
         } else if (championId == 0) {
             alert("Choose a champion");
-            console.warn("Choose a champion");
         } else {
             renderByChampion(championId, byChampion);
         }
@@ -610,9 +596,7 @@ $(document).ready(function () {
             .done(function (players, textStatus, jqXHR) {
                 
                 if (jqXHR.status == 200) {
-                    byGameTeam = players;
-                    console.log(players);
-                    
+
                     responseZone.append("<div class='row blue-side'></div>");
                     responseZone.append("<div class='row red-side'></div>");
                     
@@ -621,26 +605,24 @@ $(document).ready(function () {
                             renderByGameTeam(players, player);
                         }
                     }
-                } else {
-                    console.error(jqXHR.status, textStatus);
                 }
+
             })
-            .fail(function (error) {
-                console.error(error.status, error.responseText, error);
+          .fail(function () {
                 responseZone.text("The player is probably not in game or the game's info are not available yet. If you are sure about it, try again in a minute. See console for details.");
             });
     });
-    
-    $("#quizz-button").click(function () {
-        var masteredChampions = progression.filter(function (champion) {
-            if (/^s[\+\-]?$/i.test(champion.highestGrade)) {
-                return true;
-            }
-        });
-        var quizzChampion = masteredChampions[Math.floor(Math.random() * masteredChampions.length)].id;
-        $("#response-zone").text("Under Development<br>quizzChampion");
-        //        $("#response-zone").load("https://leagueofmasteries.eu-gb.mybluemix.net/render/quizz/cid/" + quizzChampion + "/S");
-    });
+
+    //$("#quizz-button").click(function () {
+    //    var masteredChampions = progression.filter(function (champion) {
+    //        if (/^s[\+\-]?$/i.test(champion.highestGrade)) {
+    //            return true;
+    //        }
+    //    });
+    //    var quizzChampion = masteredChampions[Math.floor(Math.random() * masteredChampions.length)].id;
+    //    $("#response-zone").text("Under Development<br>quizzChampion");
+    //    $("#response-zone").load("https://leagueofmasteries.eu-gb.mybluemix.net/render/quizz/cid/" + quizzChampion + "/S");
+    //});
     
     $("#leaderboards-button").click(function (event) {
         event.preventDefault();

@@ -1,0 +1,11 @@
+{
+  "extends": "defaults",
+  "env": {
+    "browser": true,
+    "jquery": true
+  },
+  "globals": {
+    "options": true,
+    "Chart": true
+  }
+}

@@ -1,16 +1,4 @@
 {
     "parser": "babel-eslint",
-    "extends": "airbnb",
-    "parserOptions": {
-        "ecmaVersion": 6
-    },
-    "env": {
-        "browser": true,
-        "jquery": true,
-        "node": true
-    },
-    "globals": {
-        "$": true,
-        "Chart": true
-    }
+    "extends": "defaults/configurations/airbnb/es6"
 }
