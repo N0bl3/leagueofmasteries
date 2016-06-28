@@ -2,7 +2,7 @@ let fs = require("fs");
 let request = require('request');
 let RateLimiter = require('request-rate-limiter');
 let limiter = new RateLimiter({
-    rate: 1000,
+    rate: 10,
     interval: 10,
     backOffCode: 429,
     backOffTime: 1,
@@ -87,6 +87,9 @@ function isLettersAndNumbers(str) {
     return /^[a-zA-Z0-9]+$/.test(str);
 }
 
+/**
+ * Get the version of the game and a list of all champions
+ */
 function getGameInfo() {
     limiter.request({
         url: "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=all&" + api,
@@ -120,17 +123,18 @@ app.get("/", function (req, res) {
 //Get summoner info from his name and location
 app.get("/:region/sname/:summonerName", function (req, res) {
     /**
-     * @name req.query.friend
+     * @name req.query.friend Is the user's friend
      */
     if (isRegion(req.params.region) && isLettersAndNumbers(req.params.summonerName)) {
         let region = req.params.region;
         let playerName = req.params.summonerName;
+        let friend = req.query.friend || false;
         limiter.request({
             url: "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.4/summoner/by-name/" + playerName + "?" + api,
             method: "GET",
             json: true
         }, function (error, response) {
-            if (!error && response.statusCode === 200 && req.query.friend !== "true") {
+            if (!error && response.statusCode === 200 && friend !== "true") {
                 let body = response.body[playerName];
                 
                 res.render("index.pug", {
@@ -149,7 +153,7 @@ app.get("/:region/sname/:summonerName", function (req, res) {
                         res.end(err.message);
                     }
                 });
-            } else if (!error && response.statusCode === 200 && req.query.friend === "true") {
+            } else if (!error && response.statusCode === 200 && friend === "true") {
                 res.send(response.body);
             } else {
                 console.error("Error at endpoint : /:region/:playerName\nStatus Code : " + response.statusCode);
@@ -458,7 +462,7 @@ app.get("/render/quizz/cid/:championId/:grade", function (req, res) {
     }
 });
 
-getGameInfo();
+setInterval(getGameInfo, 1000*60*60*24);
 
 // Runs the server
 app.listen(appEnv.port, function () {
