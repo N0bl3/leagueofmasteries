@@ -2,7 +2,7 @@ let fs = require("fs");
 let request = require('request');
 let RateLimiter = require('request-rate-limiter');
 let limiter = new RateLimiter({
-    rate: 10,
+    rate: 1000,
     interval: 10,
     backOffCode: 429,
     backOffTime: 1,
