@@ -1,5 +1,6 @@
 {
     "parser": "babel-eslint",
+    "extends": "airbnb",
     "parserOptions": {
         "ecmaVersion": 6
     },
@@ -9,6 +10,7 @@
         "node": true
     },
     "globals": {
-        "$": true
+        "$": true,
+        "Chart": true
     }
 }
