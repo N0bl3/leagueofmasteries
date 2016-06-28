@@ -4,7 +4,12 @@
   "description": "Visualize mastery-related data to win more games!",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "mocha tests/",
+    "prebuild": "npm test",
+    "build": "",
+    "prestart": "npm test",
     "start": "node server.js"
   },
   "engines": {
@@ -41,7 +46,11 @@
     "request-rate-limiter": "0.3.1"
   },
   "devDependencies": {
-    "chai": "*",
-    "mocha": "*"
+    "babel-cli": "6.10.1",
+    "babel-eslint": "6.1.0",
+    "babel-preset-es2015": "6.9.0",
+    "chai": "latest",
+    "eslint": "latest",
+    "mocha": "latest"
   }
 }

@@ -1,5 +1,3 @@
-/*jshint browser:true, jquery:true*/
-
 $(document).ready(function () {
     var playerId = options.playerId || "",
         playerName = options.playerName || "",
@@ -8,15 +6,16 @@ $(document).ready(function () {
         gameVersion = options.version || "",
         playerIconId = options.playerIconId || "",
         playerScore;
-
+    
     var friendCounter = 0;
     var progression, top, byChampion, byGameTeam;
     var champions = {};
-
+    
     function renderProgression(arr, sortBy) {
-        var str;
-        $("#response-zone").text("");
-
+        var str = "";
+        var responseZone = $("#response-zone");
+        responseZone.text("");
+        
         if (sortBy === "grade") {
             str = "<div class='col-xs-12'>" +
                 "<button id='by-score' type='button'>By Score</button>" +
@@ -30,7 +29,7 @@ $(document).ready(function () {
                 "</div><div class='col-xs-4'><canvas id='pie' width='100' height='100'></canvas></div><div class='col-xs-8 resume'></div>" +
                 "<div class='row text-center level level-5'><div class='col-xs-12'><h3>Level 5</h3></div></div><div class='row text-center level level-4'><div class='col-xs-12'><h3>Level 4</h3></div></div><div class='row text-center level level-3'><div class='col-xs-12'><h3>Level 3</h3></div></div><div class='row text-center level level-2'><div class='col-xs-12'><h3>Level 2</h3></div></div><div class='row level level-1'><div class='col-xs-12'><h3>Level 1</h3></div></div>";
         }
-        $("#response-zone").append(str);
+        responseZone.append(str);
         var gradesMean = 0,
             sGrades = 0,
             aGrades = 0,
@@ -44,7 +43,7 @@ $(document).ready(function () {
             levelFour = 0,
             levelFive = 0;
         arr.forEach(function (champion) {
-
+            
             champion.intGrade = !champion.intGrade ? gradeToInt(champion.highestGrade) : champion.intGrade;
             champion.smallGrade = champion.highestGrade ? champion.highestGrade.replace(/\W/g, "").toLowerCase() : 'no';
             if (champion.highestGrade) {
@@ -67,25 +66,25 @@ $(document).ready(function () {
                         break;
                 }
             }
-            if (champion.championLevel){
-            	levelMean += Number(champion.championLevel);
-            	switch (champion.championLevel) {
-            		case 1:
-            		levelOne++;
-            		break;
-            		case 2:
-            		levelTwo++;
-            		break;
-            		case 3:
-            		levelThree++;
-            		break;
-            		case 4:
-            		levelFour++;
-            		break;
-            		case 5:
-            		levelFive++;
-            		break;
-            	}
+            if (champion.championLevel) {
+                levelMean += Number(champion.championLevel);
+                switch (champion.championLevel) {
+                    case 1:
+                        levelOne++;
+                        break;
+                    case 2:
+                        levelTwo++;
+                        break;
+                    case 3:
+                        levelThree++;
+                        break;
+                    case 4:
+                        levelFour++;
+                        break;
+                    case 5:
+                        levelFive++;
+                        break;
+                }
             }
             if (sortBy === "grade") {
                 $("." + champion.smallGrade + "-grade").append("<div class='col-xs-3'><p>" +
@@ -104,55 +103,56 @@ $(document).ready(function () {
                     "</span><br>Score : " + champion.championPoints +
                     "</p></div>");
             }
-
+            
         });
-
+        
         gradesMean = Math.round(gradesMean / (arr.length));
-        levelMean  = Math.round(levelMean / (arr.length));
+        levelMean = Math.round(levelMean / (arr.length));
         Chart.defaults.global.legend.display = true;
         Chart.defaults.global.legend.labels.boxWidth = 10;
-		if (sortBy === "grade"){
-        $(".resume").append("<div class='col-xs-12'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-12'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-12'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-12'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-12'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-12'><h4>D grade : " + dGrades + "</h4></div>");
-        var pie = new Chart($("#pie"), {
-    		type: 'pie',
-    		data: {
-    			labels: [
-    				"S",
-    				"A",
-    				"B",
-    				"C",
-    				"D"
-    			],
-    			datasets: [
-    				{
-    					data: [sGrades, aGrades, bGrades, cGrades, dGrades],
-    					backgroundColor: ["#21DD60", "#8CDD21", "#D8BD20", "#DB8720", "#E02121"]
-    				}
-    			]
-    		}
-		});
-		} else if (sortBy === "score"){
-        $(".resume").append("<div class='col-xs-12'><h4>Mean level : " + levelMean + "</h4></div><div class='col-xs-12'><h4>Level 5 : " + levelFive + "</h4></div><div class='col-xs-12'><h4>Level 4 : " + levelFour + "</h4></div><div class='col-xs-12'><h4>Level 3 : " + levelThree + "</h4></div><div class='col-xs-12'><h4>Level 2 : " + levelTwo + "</h4></div><div class='col-xs-12'><h4>Level 1 : " + levelOne + "</h4></div>");
-        var pie = new Chart($("#pie"), {
-    		type: 'pie',
-    		data: {
-    			labels: [
-    				"5",
-    				"4",
-    				"3",
-    				"2",
-    				"1"
-    			],
-    			datasets: [
-    				{
-    					data: [levelFive, levelFour, levelThree, levelTwo, levelOne],
-    					backgroundColor: ["#21DD60", "#8CDD21", "#D8BD20", "#DB8720", "#E02121"]
-    				}
-    			]
-    		}
-		});
-		}
-
+        var resume = $(".resume");
+        if (sortBy === "grade") {
+            resume.append("<div class='col-xs-12'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-12'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-12'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-12'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-12'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-12'><h4>D grade : " + dGrades + "</h4></div>");
+            var pie = new Chart($("#pie"), {
+                type: 'pie',
+                data: {
+                    labels: [
+                        "S",
+                        "A",
+                        "B",
+                        "C",
+                        "D"
+                    ],
+                    datasets: [
+                        {
+                            data: [sGrades, aGrades, bGrades, cGrades, dGrades],
+                            backgroundColor: ["#21DD60", "#8CDD21", "#D8BD20", "#DB8720", "#E02121"]
+                        }
+                    ]
+                }
+            });
+        } else if (sortBy === "score") {
+            resume.append("<div class='col-xs-12'><h4>Mean level : " + levelMean + "</h4></div><div class='col-xs-12'><h4>Level 5 : " + levelFive + "</h4></div><div class='col-xs-12'><h4>Level 4 : " + levelFour + "</h4></div><div class='col-xs-12'><h4>Level 3 : " + levelThree + "</h4></div><div class='col-xs-12'><h4>Level 2 : " + levelTwo + "</h4></div><div class='col-xs-12'><h4>Level 1 : " + levelOne + "</h4></div>");
+            var pie = new Chart($("#pie"), {
+                type: 'pie',
+                data: {
+                    labels: [
+                        "5",
+                        "4",
+                        "3",
+                        "2",
+                        "1"
+                    ],
+                    datasets: [
+                        {
+                            data: [levelFive, levelFour, levelThree, levelTwo, levelOne],
+                            backgroundColor: ["#21DD60", "#8CDD21", "#D8BD20", "#DB8720", "#E02121"]
+                        }
+                    ]
+                }
+            });
+        }
+        
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
@@ -173,18 +173,20 @@ $(document).ready(function () {
             renderProgression(progression, "score");
         });
     }
-
+    
     function renderTop(arr) {
-        $("#response-zone").text("");
-        $("#response-zone").append("<div class='row'><div class='col-xs-12'>" +
+    
+        var responseZone = $("#response-zone");
+        responseZone.text("");
+        responseZone.append("<div class='row'><div class='col-xs-12'>" +
             "<button id='by-score' type='button'>By Score</button>" +
             "<button id='by-grade' type='button'>By Grade</button>" +
             "</div></div>");
-        $("#response-zone").append("<div class='row text-center resume'></div>");
-        $("#response-zone").append("<div class='row text-center top-first'></div>");
-        $("#response-zone").append("<div class='row text-center top-second'></div>");
-        $("#response-zone").append("<div class='row text-center top-third'></div>");
-
+        responseZone.append("<div class='row text-center resume'></div>");
+        responseZone.append("<div class='row text-center top-first'></div>");
+        responseZone.append("<div class='row text-center top-second'></div>");
+        responseZone.append("<div class='row text-center top-third'></div>");
+        
         var gradesMean = 0,
             sGrades = 0,
             aGrades = 0,
@@ -231,7 +233,7 @@ $(document).ready(function () {
         });
         gradesMean = Math.round(gradesMean / (arr.length));
         $(".resume").append("<div class='col-xs-2'><h4>Mean grade : " + intToGrade(gradesMean) + "</h4></div><div class='col-xs-2'><h4>S grade : " + sGrades + "</h4></div><div class='col-xs-2'><h4>A grade : " + aGrades + "</h4></div><div class='col-xs-2'><h4>B grade : " + bGrades + "</h4></div><div class='col-xs-2'><h4>C grade : " + cGrades + "</h4></div><div class='col-xs-2'><h4>D grade : " + dGrades + "</h4></div>");
-
+        
         $("#by-grade").click(function (e) {
             e.preventDefault();
             var gradeArr = [],
@@ -239,15 +241,15 @@ $(document).ready(function () {
             top.forEach(function (champion) {
                 sortingArr.push([champion, gradeToInt(champion.highestGrade)]);
             });
-
+            
             sortingArr.sort(function (a, b) {
                 return b[1] - a[1];
             });
-
+            
             for (var i = 0; i < sortingArr.length; i++) {
                 gradeArr.push(sortingArr[i][0]);
             }
-
+            
             renderTop(gradeArr);
         });
         $("#by-score").click(function (e) {
@@ -255,7 +257,7 @@ $(document).ready(function () {
             renderTop(top);
         });
     }
-
+    
     function renderByChampion(championId, data, textStatus, jqXHR) {
         $("#response-zone").text("");
         friendCounter = 0;
@@ -275,11 +277,11 @@ $(document).ready(function () {
             renderChampion(championId, data);
         }
     }
-
+    
     function renderChampion(championId, data, champion) {
         if (champion) {
             champion = champions[championId];
-
+            
             $("#response-zone").append("<div class='row'><div class='col-xs-3 me'></div><div class='col-xs-3 friend-compare'>" +
                 "<p><img src='http://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion.key + "_0.jpg' alt='" + data.championName + "' class='top-img'><br><span id='champion-name'>" +
                 data.championName +
@@ -319,9 +321,11 @@ $(document).ready(function () {
         }
         $(".me").append(str);
 
-        $("#friend-by-name").submit(function (event) {
-            event.preventDefault();
 
+        var friendByName = $("#friend-by-name");
+        friendByName.submit(function (event) {
+            event.preventDefault();
+            
             if (friendCounter < 6) {
                 var submission = $(this).serializeArray();
                 var friendName = submission[0].value.trim().replace(/\s/g, "").toLowerCase();
@@ -331,13 +335,13 @@ $(document).ready(function () {
                 alert("You reached the maximum amount of friends! Click reset or try a new champ.");
             }
         });
-        $("#friend-by-name").on("reset", function (event) {
+        friendByName.on("reset", function (event) {
             event.preventDefault();
             $(".friend-list").text("");
             friendCounter = 0;
         });
     }
-
+    
     function renderFriendChampion(championId, friendPosition, friendName, friendRegion) {
         $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + friendRegion + "/sname/" + friendName + "?friend=true")
             .done(function (json, textStatus, jqXHR) {
@@ -373,11 +377,11 @@ $(document).ready(function () {
                 }
             });
     }
-
+    
     function renderByGameTeam(players, player) {
         return (function () {
             var counter = player;
-
+            
             $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/champion/" + players[counter].championId)
                 .done(function (champion) {
                     var championName = champion.name;
@@ -412,7 +416,7 @@ $(document).ready(function () {
                 });
         })();
     }
-
+    
     function renderRecommendedChampion(region, playerId) {
         $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + playerId + "/recommended")
             .done(function (data) {
@@ -425,7 +429,7 @@ $(document).ready(function () {
                     "<div class='text-center col-xs-12 col-md-3'><p>Or become polyvalent with a " + nemesis.tags[0] + " " + (nemesis.tags[1] || "") + "</p></div>");
             });
     }
-
+    
     function gradeToInt(grade) {
         switch (grade) {
             case 'D-':
@@ -462,7 +466,7 @@ $(document).ready(function () {
                 return 0;
         }
     }
-
+    
     function intToGrade(int) {
         switch (int) {
             case 1:
@@ -499,9 +503,10 @@ $(document).ready(function () {
                 return 'None';
         }
     }
-
-    $("#response-zone").text("");
-    $("#response-zone").append("<h3>ID: " + playerId + " - " + playerName + "</h3>");
+    
+    var responseZone = $("#response-zone");
+    responseZone.text("");
+    responseZone.append("<h3>ID: " + playerId + " - " + playerName + "</h3>");
     $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + playerId)
         .done(function (score) {
             $("#player-score").text("");
@@ -519,7 +524,7 @@ $(document).ready(function () {
             } else {
                 progressClass = "progress-bar-success";
             }
-
+            
             $("#player-score").append("<h4>Mastery score : " + playerScore + "/650</h4>")
                 .append('<div class="progress">' +
                     '<div class="progress-bar ' + progressClass + '" role="progressbar" aria-valuenow="' + percentage + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percentage + '%;">' +
@@ -527,7 +532,7 @@ $(document).ready(function () {
                     '</div></div>');
         });
     $(".nav>li>a").removeAttr("disabled");
-
+    
     $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + playerId + "/champions")
         .done(function (arr) {
             progression = arr;
@@ -536,20 +541,20 @@ $(document).ready(function () {
             });
             renderProgression(progression, "score");
         });
-
+    
     renderRecommendedChampion(region, playerId);
-
+    
     $("form#summ-by-name").submit(function (event) {
         event.preventDefault();
         var submission = $(this).serializeArray();
         playerName = submission[0].value;
         region = submission[1].value;
-
+        
         playerName = playerName.trim().replace(/\s/g, "").toLowerCase();
-
+        
         $("body").load("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/sname/" + playerName);
     });
-
+    
     $("#progression-button").click(function (event) {
         event.preventDefault();
         if (!progression) {
@@ -562,7 +567,7 @@ $(document).ready(function () {
             renderProgression(progression, "score");
         }
     });
-
+    
     $("#get-top-ten").click(function (event) {
         event.preventDefault();
         if (!top) {
@@ -575,10 +580,10 @@ $(document).ready(function () {
             renderTop(top);
         }
     });
-
+    
     $("form#by-champion").submit(function (event) {
         event.preventDefault();
-
+        
         var submission = $(this).serializeArray();
         var championId = submission[0].value;
         if (championId != 0 && (!byChampion || byChampion.championId != championId)) {
@@ -596,23 +601,25 @@ $(document).ready(function () {
             renderByChampion(championId, byChampion);
         }
     });
-
+    
     $("#get-game-team-mastery").click(function (event) {
         event.preventDefault();
-        $("#response-zone").text("");
+        var responseZone = $("#response-zone");
+        responseZone.text("");
         $.getJSON("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/pid/" + playerId + "/game-team")
             .done(function (players, textStatus, jqXHR) {
-
+                
                 if (jqXHR.status == 200) {
                     byGameTeam = players;
                     console.log(players);
-
-                    $("#response-zone").append("<div class='row blue-side'></div>");
-                    $("#response-zone").append("<div class='row red-side'></div>");
-
-                    var player;
+                    
+                    responseZone.append("<div class='row blue-side'></div>");
+                    responseZone.append("<div class='row red-side'></div>");
+                    
                     for (var player in players) {
-                        renderByGameTeam(players, player);
+                        if(players.hasOwnProperty(player)) {
+                            renderByGameTeam(players, player);
+                        }
                     }
                 } else {
                     console.error(jqXHR.status, textStatus);
@@ -620,11 +627,11 @@ $(document).ready(function () {
             })
             .fail(function (error) {
                 console.error(error.status, error.responseText, error);
-                $("#response-zone").text("The player is probably not in game or the game's info are not available yet. If you are sure about it, try again in a minute. See console for details.");
+                responseZone.text("The player is probably not in game or the game's info are not available yet. If you are sure about it, try again in a minute. See console for details.");
             });
     });
-
-    $("#quizz-button").click(function (event) {
+    
+    $("#quizz-button").click(function () {
         var masteredChampions = progression.filter(function (champion) {
             if (/^s[\+\-]?$/i.test(champion.highestGrade)) {
                 return true;
@@ -634,7 +641,7 @@ $(document).ready(function () {
         $("#response-zone").text("Under Development<br>quizzChampion");
         //        $("#response-zone").load("https://leagueofmasteries.eu-gb.mybluemix.net/render/quizz/cid/" + quizzChampion + "/S");
     });
-
+    
     $("#leaderboards-button").click(function (event) {
         event.preventDefault();
         alert("This is in development!");

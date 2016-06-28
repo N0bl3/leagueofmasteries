@@ -1,3 +1,6 @@
+/**
+ * @name $
+ */
 $(document).ready(function () {
 
     $("form#summ-by-name").submit(function (event) {
