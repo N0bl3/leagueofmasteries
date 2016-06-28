@@ -1,0 +1,4 @@
+---
+applications:
+- name: leagueOfMasteries
+  memory: 256M
