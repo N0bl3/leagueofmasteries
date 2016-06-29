@@ -1,7 +1,0 @@
-{
-  "extends": "defaults",
-  "env": {
-    "node": true,
-    "mocha": true
-  }
-}
