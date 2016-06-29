@@ -120,7 +120,7 @@ app.get('/:region/sname/:summonerName', (req, res) => {
     const playerName = req.params.summonerName;
     const friend = req.query.friend || false;
     limiter.request({
-      url: `https://region.api.pvp.net/api/lol/${region}/v1.4/summoner/by-name/${playerName}?${api}`,
+      url: `https://${region}.api.pvp.net/api/lol/${region}/v1.4/summoner/by-name/${playerName}?${api}`,
       method: 'GET',
       json: true,
     }, (error, response) => {
@@ -145,7 +145,6 @@ app.get('/:region/sname/:summonerName', (req, res) => {
       }else if (!error && response.statusCode === 200 && friend === 'true') {
         res.send(response.body);
       }else {
-        console.error(error);
         res.status(500).end('Error while starting app!');
       }
     });
