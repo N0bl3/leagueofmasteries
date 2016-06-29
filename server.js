@@ -448,6 +448,7 @@ app.get('/render/quizz/cid/:championId/:grade', (req, res) => {
   }
 });
 
+getGameInfo();
 setInterval(getGameInfo, 1000 * 60 * 60 * 24);
 
 // Runs the server
