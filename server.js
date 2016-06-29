@@ -145,7 +145,8 @@ app.get('/:region/sname/:summonerName', (req, res) => {
       }else if (!error && response.statusCode === 200 && friend === 'true') {
         res.send(response.body);
       }else {
-        res.sendStatus(response.statusCode);
+        console.error(error);
+        res.status(500).end('Error while starting app!');
       }
     });
   }
