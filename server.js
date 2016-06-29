@@ -65,7 +65,13 @@ function regionToPlatformId(region) {
  * @returns {Object}  The wanted champion
  */
 function champIdToChampObject(champId) {
-  return Object.keys(champions).some((champion) => champId === champions[champion].id);
+  let target;
+  Object.keys(champions).forEach((champion) => {
+  	if (champId === champions[champion].id) {
+  		target = champions[champion];
+  	}
+  });
+  return target;
 }
 
 /**
@@ -93,6 +99,7 @@ function getGameInfo() {
     if (!error && response.statusCode === 200) {
       champions = response.body.data;
       version = response.body.version;
+      console.log(champions);
     }
     if (error) {
       throw new Error('Cannot connect to Riot API');
@@ -218,8 +225,8 @@ app.get('/:region/pid/:playerId/champions', (req, res) => {
       json: true,
     }, (error, response) => {
       if (!error && response.statusCode === 200) {
-        response.body.forEach((champion) => {
-          Object.assign(champion, champIdToChampObject(champion.championId));
+        response.body.forEach((champion, index, array) => {
+          champion = Object.assign(champion, champIdToChampObject(champion.championId));
         });
         res.send(response.body);
       }else {
@@ -270,7 +277,7 @@ app.get('/:region/pid/:playerId/top', (req, res) => {
     }, (error, response) => {
       if (!error && response.statusCode === 200) {
         response.body.forEach((champion) => {
-          Object.assign(champion, champIdToChampObject(champion.championId));
+          champion = Object.assign(champion, champIdToChampObject(champion.championId));
         });
         res.send(response.body);
       }else {
@@ -447,7 +454,6 @@ app.get('/render/quizz/cid/:championId/:grade', (req, res) => {
     res.sendStatus(400);
   }
 });
-
 getGameInfo();
 setInterval(getGameInfo, 1000 * 60 * 60 * 24);
 
