@@ -8,6 +8,6 @@ $(document).ready(function () {
 
     playerName = playerName.trim().replace(/\s/g, "").toLowerCase();
 
-    $('body').load(window.location.href + region + "/sname/" + playerName);
+    $('body').load("https://leagueofmasteries.eu-gb.mybluemix.net/" + region + "/sname/" + playerName);
   });
 });
