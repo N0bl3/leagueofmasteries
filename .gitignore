@@ -2,3 +2,4 @@
 /node_modules/
 /distribution/
 npm-debug.log
+manifest.yml
