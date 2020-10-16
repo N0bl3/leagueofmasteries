@@ -2,7 +2,6 @@
 applications:
 - name: leagueOfMasteries
   memory: 256M
-  domain: eu-gb.mybluemix.net
-  host: leagueofmasteries
+  routes: leagueofmasteries.eu-gb.mybluemix.net
   env:
     NODE_ENV: production
