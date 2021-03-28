@@ -39,7 +39,7 @@
     "cfenv": "^1.0.3",
     "@cloudant/cloudant": "^2.0.1",
     "express": "^4.13.4",
-    "pug": "^2.0.0-alpha6",
+    "pug": ">=3.0.1",
     "redis": "^2.6.0-2",
     "request": "^2.72.0",
     "request-rate-limiter": "0.3.1"
